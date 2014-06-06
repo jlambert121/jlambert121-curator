@@ -71,5 +71,4 @@ describe 'curator::job', :type => :define do
     it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host es.mycompany.com --port 1000 -t 200 -p 'example' -s '-' -C time -T hours -l /data/curator.log -d 10") }
   end
 
-  skip "document me"
 end

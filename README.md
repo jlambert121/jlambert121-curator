@@ -36,7 +36,7 @@ older than 30 days, and disable bloom filters and optimize older than two days.
   }
 ```
 
-Additional tuning and defaults are listed in the job.pp.
+Additional tuning and defaults are listed in the [job.pp] (blob/master/manifests/job.pp).
 
 
 Known Issues:

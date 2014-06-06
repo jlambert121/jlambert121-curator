@@ -11,7 +11,5 @@ describe 'curator', :type => :class do
     it { should contain_package('elasticsearch-curator').with(:ensure => '1.2.3') }
   end
 
-  skip "document me"
-
 end
 
