@@ -1,9 +1,11 @@
 What is it?
 ===========
 
-A puppet module for installing and configuring [elasticsearch-curator] (https://github.com/elasticsearch/curator).
+A puppet module for installing and configuring [elasticsearch-curator](https://github.com/elasticsearch/curator).
 
 Curator is used to manaage and clean up time-series elasticsearch indexes.
+
+A good [blog post](http://www.elasticsearch.org/blog/curator-tending-your-time-series-indices/) on why and how curator.
 
 
 Installation
@@ -36,7 +38,7 @@ older than 30 days, and disable bloom filters and optimize older than two days.
   }
 ```
 
-Additional tuning and defaults are listed in the [job.pp] (manifests/job.pp).
+Additional tuning and defaults are listed in the [job.pp](manifests/job.pp).
 
 
 Known Issues:
