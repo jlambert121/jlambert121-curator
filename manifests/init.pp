@@ -9,16 +9,24 @@
 #   String.  Version of curator to be installed
 #   Default: latest
 #
-# [*package_name*]
-#   String.  Name of the package to be installed
-#   Default: python-elasticsearch-curator
+# [*provider*]
+#   String.  Name of the provider to install the package with.
+#   Default: undef
 #
+# [*manage_pip*]
+#   Bool.  If true require the pip package. If false do nothing.
+#   Default: false
 #
 # === Examples
 #
 # * Installation:
 #     class { 'curator': }
 #
+# * Installation with pip:
+#     class { 'curator':
+#       provider   => 'pip',
+#       manage_pip => true,
+#     }
 #
 # === Authors
 #
@@ -31,10 +39,23 @@
 #
 class curator (
   $ensure       = 'latest',
-  $package_name = 'python-elasticsearch-curator',
-){
+  $provider     = undef,
+  $manage_pip   = false
+) {
 
-  package { $package_name:
-    ensure  => $ensure,
+  case $provider {
+    pip: {
+      package { 'elasticsearch-curator':
+        ensure   => $ensure,
+        provider => pip,
+      }
+    }
+    default: {
+      package { 'python-elasticsearch-curator': ensure => $ensure }
+    }
+  }
+
+  if $manage_pip {
+    package { 'python-pip': ensure => installed }
   }
 }
