@@ -11,6 +11,7 @@
 #
 # [*provider*]
 #   String.  Name of the provider to install the package with.
+#            If not specified will use system's default provider.
 #   Default: undef
 #
 # [*manage_pip*]
