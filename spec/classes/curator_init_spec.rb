@@ -17,5 +17,10 @@ describe 'curator', :type => :class do
     it { should contain_package('python-pip').with(:ensure => 'installed') }
   end
 
+  context 'require version >= 1.1.0' do
+    let(:prams) { { :ensure => '1.0.0' } }
+    it { expect { should raise_error(Puppet::Error) } }
+  end
+
 end
 
