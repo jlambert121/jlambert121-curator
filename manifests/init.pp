@@ -44,6 +44,12 @@ class curator (
   $manage_pip   = false
 ) {
 
+  if ( $ensure != 'latest' or $ensure != 'absent' ) {
+    if versioncmp($ensure, '1.1.0') < 0 {
+      fail('This version of the module only supports version 1.1.0 or later of curator')
+    }
+  }
+
   case $provider {
     pip: {
       package { 'elasticsearch-curator':

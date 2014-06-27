@@ -4,7 +4,12 @@ describe 'curator::job', :type => :define do
   let(:title) { 'myjob' }
 
   # delete_older is set frequently to prevent "no older error"
-  context 'no params' do
+  context 'no command' do
+    it { expect { should raise_error(Puppet::Error) } }
+  end
+
+  context 'multiple commands' do
+    let(:params) { { :delete_older => 10, :bloom_older => 10 } }
     it { expect { should raise_error(Puppet::Error) } }
   end
 
@@ -13,48 +18,84 @@ describe 'curator::job', :type => :define do
     it { expect { should raise_error(Puppet::Error) } }
   end
 
-  [ 'curation_style', 'time_unit', 'port', 'timeout', 'close_older', 'bloom_older', 'optimize_older', '$max_num_segments' ].each do |field|
+  [ 'curation_style', 'time_unit', 'port', 'timeout', 'max_num_segments' ].each do |field|
     context "bad #{field}" do
-      let(:prams) { { field.to_sym => 'bad', :delete_older => 10 } }
+      let(:prams) { { field.to_sym => 'bad', :optimize_older => 10, :timeout => 4000 } }
       it { expect { should raise_error(Puppet::Error) } }
     end
   end
 
-  context 'bad delete_older' do
-    let(:params) { { :delete_older => 'bad' } }
-    it { expect { should raise_error(Puppet::Error) } }
+  [ 'disk_space', 'delete_older', 'close_older', 'bloom_older', 'optimize_older', 'allocation_older', 'snapshot_older', 'alias_older' ].each do |field|
+    context "bad #{field}" do
+      let(:prams) { { field.to_sym => 'bad', :timeout => 4000 } }
+      it { expect { should raise_error(Puppet::Error) } }
+    end
   end
 
-  context 'bad disk_space' do
-    let(:params) { { :curation_style => 'space', :disk_space => 'bad' } }
-    it { expect { should raise_error(Puppet::Error) } }
+  context 'delete' do
+    context 'older' do
+      # setting delete_older to prevent error
+      let(:params) { { :delete_older => 10 } }
+      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator delete --older-than 10 -T days --host localhost --port 9200 -t 30 -p 'logstash-' -s '.' -l /var/log/curator.log") }
+    end
+
+    context 'space' do
+      let(:params) { { :disk_space => 1024 } }
+      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator delete --disk-space 1024 -T days --host localhost --port 9200 -t 30 -p 'logstash-' -s '.' -l /var/log/curator.log" ) }
+    end
   end
 
-  context 'default params' do
-    # setting delete_older to prevent error
-    let(:params) { { :delete_older => 10 } }
-    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 -t 30 -p 'logstash-' -s '.' -C time -T days -l /var/log/curator.log -d 10") }
+  context 'bloom' do
+    let(:params) { { :bloom_older => 10 } }
+    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator bloom --older-than 10 -T days --host localhost --port 9200 -t 30 -p 'logstash-' -s '.' -l /var/log/curator.log") }
   end
 
-  context 'curation_style = space' do
-    let(:params) { { :curation_style => 'space', :disk_space => 1024 } }
-    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 -t 30 -p 'logstash-' -s '.' -C space -T days -l /var/log/curator.log -g 1024" ) }
+  context 'optimize' do
+    context 'optimze_older' do
+      let(:params) { { :optimize_older => 10, :timeout => 3600 } }
+      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator optimize --older-than 10 --max_num_segments 2 -T days --host localhost --port 9200 -t 3600 -p 'logstash-' -s '.' -l /var/log/curator.log") }
+    end
+
+    context 'optimize_older, timeout < 3600' do
+      let(:params) { { :optimize_older => 2, :timeout => 3599}}
+      it { expect { should raise_error(Puppet::Error) } }
+    end
   end
 
-  context 'curation_style = space and delete_older' do
-    let(:params) { { :curation_style => 'space', :disk_space => 1024, :delete_older => 10 } }
-    it { expect { should raise_error(Puppet::Error) } }
+  context 'allocation' do
+    context 'missing tag' do
+      let(:params) { { :allocation_older => 10 } }
+      it { expect { should raise_error(Puppet::Error) } }
+    end
+
+    context 'correct params' do
+      let(:params) { { :allocation_older => 10, :rule => 'tag=something' } }
+      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator allocation --older-than 10 --rule tag=something -T days --host localhost --port 9200 -t 30 -p 'logstash-' -s '.' -l /var/log/curator.log") }
+    end
   end
 
-  context 'optimize_older, timeout < 3600' do
-    let(:params) { { :optimize_older => 2, :timeout => 3599}}
-    it { expect { should raise_error(Puppet::Warning) } }
-    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 -t 3599 -p 'logstash-' -s '.' -C time -T days -l /var/log/curator.log -o 2 --max_num_segments 2") }
+  context 'snapshot' do
+    context 'without repository' do
+      let(:params) { { :snapshot_older => 10 } }
+      it { expect { should raise_error(Puppet::Error) } }
+    end
+
+    context 'correct params' do
+      let(:params) { { :snapshot_older => 10, :repository => 'test' } }
+        it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator snapshot --older-than 10 --repository test -T days --host localhost --port 9200 -t 30 -p 'logstash-' -s '.' -l /var/log/curator.log") }
+    end
   end
 
-  context 'all orders' do
-    let(:params) { { :delete_older => 90, :close_older => 30, :bloom_older => 2, :optimize_older => 2 } }
-    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 -t 30 -p 'logstash-' -s '.' -C time -T days -l /var/log/curator.log -d 90 -c 30 -b 2 -o 2 --max_num_segments 2") }
+  context 'alias' do
+    context 'no alias' do
+      let(:params) { { :alias_older => 7 } }
+      it { expect { should raise_error(Puppet::Error) } }
+    end
+
+    context 'correct params' do
+      let(:params) { { :alias_older => 7, :alias_name => 'last_week' } }
+      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator alias --older-than 7 --alias last_week -T days --host localhost --port 9200 -t 30 -p 'logstash-' -s '.' -l /var/log/curator.log") }
+    end
   end
 
   context 'set all other params' do
@@ -68,7 +109,7 @@ describe 'curator::job', :type => :define do
       :logfile      => '/data/curator.log',
       :delete_older => 10
     } }
-    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host es.mycompany.com --port 1000 -t 200 -p 'example' -s '-' -C time -T hours -l /data/curator.log -d 10") }
+    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator delete --older-than 10 -T hours --host es.mycompany.com --port 1000 -t 200 -p 'example' -s '-' -l /data/curator.log") }
   end
 
 end
