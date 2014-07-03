@@ -16,10 +16,6 @@
 #   Integer.  Elasticsearch port
 #   Default: 9200
 #
-# [*timeout*]
-#   Integer.  Elasticsearch timeout
-#   Default 30
-#
 # [*prefix*]
 #   String.  Prefix for the indices. Indices that do not have this prefix are skipped.
 #   Default: logstash-
@@ -103,7 +99,6 @@
 #   }
 #   curator::job { 'weekly_optimize':
 #     optimize_older  => 7,
-#     timeout         => 86400,
 #     cron_weekday    => 6,
 #     cron_hour       => 11
 #   }
@@ -120,7 +115,6 @@ define curator::job (
   $path             = '/usr/bin/curator',
   $host             = 'localhost',
   $port             = 9200,
-  $timeout          = 30,
   $prefix           = 'logstash-',
   $separator        = '.',
   $time_unit        = 'days',
@@ -163,10 +157,6 @@ define curator::job (
     fail("curator::job(${name}) port must be integer")
   }
 
-  if !(is_integer($timeout)) {
-    fail("curator::job(${name}) timeout must be an integer (seconds)")
-  }
-
   if !(is_integer($max_num_segments)) {
     fail("curator::job(${name}) max_num_segments must be an integer")
   }
@@ -201,10 +191,6 @@ define curator::job (
 
   if $disk_space and !(is_integer($disk_space)) {
     fail("curator::job(${name}) disk_space must be an integer")
-  }
-
-  if $optimize_older and $timeout < 3600 {
-    fail("curator::job(${name}) optimize_older is set with a timeout of ${timeout}.  The minimum recommended timeout is 3600")
   }
 
   # Wow that was a lot of validation
@@ -257,7 +243,7 @@ define curator::job (
   }
 
   cron { "curator_${name}":
-    command => "${path}${d_string}${c_string}${b_string}${o_string}${a_string}${a2_string}${s_string}${g_string} -T ${time_unit} --host ${host} --port ${port} -t ${timeout} -p '${prefix}' -s '${separator}' -l ${logfile}",
+    command => "${path}${d_string}${c_string}${b_string}${o_string}${a_string}${a2_string}${s_string}${g_string} -T ${time_unit} --host ${host} --port ${port} -p '${prefix}' -s '${separator}' -l ${logfile}",
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,
