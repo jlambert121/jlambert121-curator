@@ -36,24 +36,24 @@ describe 'curator::job', :type => :define do
     context 'older' do
       # setting delete_older to prevent error
       let(:params) { { :delete_older => 10 } }
-      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator delete --older-than 10 -T days --host localhost --port 9200 -p 'logstash-' -s '.' -l /var/log/curator.log") }
+      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 -l /var/log/curator.log delete --older-than 10 -T days -p 'logstash-' -s '.'") }
     end
 
     context 'space' do
       let(:params) { { :disk_space => 1024 } }
-      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator delete --disk-space 1024 -T days --host localhost --port 9200 -p 'logstash-' -s '.' -l /var/log/curator.log" ) }
+      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 -l /var/log/curator.log delete --disk-space 1024 -T days -p 'logstash-' -s '.'" ) }
     end
   end
 
   context 'bloom' do
     let(:params) { { :bloom_older => 10 } }
-    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator bloom --older-than 10 -T days --host localhost --port 9200 -p 'logstash-' -s '.' -l /var/log/curator.log") }
+    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 -l /var/log/curator.log bloom --older-than 10 -T days -p 'logstash-' -s '.'") }
   end
 
   context 'optimize' do
     context 'optimze_older' do
       let(:params) { { :optimize_older => 10 } }
-      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator optimize --older-than 10 --max_num_segments 2 -T days --host localhost --port 9200 -p 'logstash-' -s '.' -l /var/log/curator.log") }
+      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 -l /var/log/curator.log optimize --older-than 10 --max_num_segments 2 -T days -p 'logstash-' -s '.'") }
     end
 
   end
@@ -66,7 +66,7 @@ describe 'curator::job', :type => :define do
 
     context 'correct params' do
       let(:params) { { :allocation_older => 10, :rule => 'tag=something' } }
-      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator allocation --older-than 10 --rule tag=something -T days --host localhost --port 9200 -p 'logstash-' -s '.' -l /var/log/curator.log") }
+      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 -l /var/log/curator.log allocation --older-than 10 --rule tag=something -T days -p 'logstash-' -s '.'") }
     end
   end
 
@@ -78,7 +78,7 @@ describe 'curator::job', :type => :define do
 
     context 'correct params' do
       let(:params) { { :snapshot_older => 10, :repository => 'test' } }
-        it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator snapshot --older-than 10 --repository test -T days --host localhost --port 9200 -p 'logstash-' -s '.' -l /var/log/curator.log") }
+        it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 -l /var/log/curator.log snapshot --older-than 10 --repository test -T days -p 'logstash-' -s '.'") }
     end
   end
 
@@ -90,7 +90,7 @@ describe 'curator::job', :type => :define do
 
     context 'correct params' do
       let(:params) { { :alias_older => 7, :alias_name => 'last_week' } }
-      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator alias --older-than 7 --alias last_week -T days --host localhost --port 9200 -p 'logstash-' -s '.' -l /var/log/curator.log") }
+      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 -l /var/log/curator.log alias --older-than 7 --alias last_week -T days -p 'logstash-' -s '.'") }
     end
   end
 
@@ -104,7 +104,7 @@ describe 'curator::job', :type => :define do
       :logfile      => '/data/curator.log',
       :delete_older => 10
     } }
-    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator delete --older-than 10 -T hours --host es.mycompany.com --port 1000 -p 'example' -s '-' -l /data/curator.log") }
+    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host es.mycompany.com --port 1000 -l /data/curator.log delete --older-than 10 -T hours -p 'example' -s '-'") }
   end
 
 end
