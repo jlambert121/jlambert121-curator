@@ -7,12 +7,14 @@ Curator is used to manaage and clean up time-series elasticsearch indexes.
 
 A good [blog post](http://www.elasticsearch.org/blog/curator-tending-your-time-series-indices/) on why and how curator.
 
+NOTE: If you are using curator < 1.1.0 use version 0.0.1 of this module.
+
 
 Installation
 ------------
 
-Currently this package only supports installing curator via RPMs.  These can
-easily be created by running
+Currently this package supports installing curator via pip or your local
+package manager.  RPM packages can easly be created by running:
 ```
 fpm -s python -t rpm urllib3
 fpm -s python -t rpm elasticsearch
@@ -22,19 +24,34 @@ fpm -s python -t rpm elasticsearch-curator
 Usage:
 ------
 
-Generic curator install
-<pre>
-  class { 'curator': }
-</pre>
-
-Schedule a curator job to delete indexes oler than 90 days, close indexes
-older than 30 days, and disable bloom filters and optimize older than two days.
+Generic curator install (local package manager)
 ```puppet
-  curator::job { 'cleanup':
-    delete_older    => 90,
-    close_older     => 30,
-    optimize_older  => 2
+  class { 'curator': }
+```
+
+Install via pip
+```puppet
+  class { 'curator':
+    provider => 'pip'
+  }
+```
+
+Disable bloom filters on indexes over 2 days old
+```puppet
+  curator::job { 'logstash_bloom':
     bloom_older     => 2,
+    cron_hour       => 7,
+    cron_minute     => 20,
+  }
+```
+
+Delete marvel indexes older than a week
+```puppet
+  curator::job { 'marvel_delete':
+    prefix          => '.marvel-',
+    delete_older    => 7,
+    cron_hour       => 7,
+    cron_minute     => 02
   }
 ```
 
@@ -45,9 +62,6 @@ Known Issues:
 -------------
 Only tested on CentOS 6
 
-TODO:
-____
-[ ] Allow using the pip package provider
 
 License:
 _______
