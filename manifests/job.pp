@@ -243,7 +243,7 @@ define curator::job (
   }
 
   cron { "curator_${name}":
-    command => "${path}${d_string}${c_string}${b_string}${o_string}${a_string}${a2_string}${s_string}${g_string} -T ${time_unit} --host ${host} --port ${port} -p '${prefix}' -s '${separator}' -l ${logfile}",
+    command => "${path} --host ${host} --port ${port} -l ${logfile}${d_string}${c_string}${b_string}${o_string}${a_string}${a2_string}${s_string}${g_string} -T ${time_unit} -p '${prefix}' -s '${separator}'",
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,
