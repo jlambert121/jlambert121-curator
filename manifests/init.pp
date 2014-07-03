@@ -50,6 +50,13 @@ class curator (
     }
   }
 
+  if $manage_pip {
+    package { 'python-pip':
+      ensure  => installed,
+      before  => Package['elasticsearch-curator'],
+    }
+  }
+
   case $provider {
     pip: {
       package { 'elasticsearch-curator':
@@ -58,11 +65,10 @@ class curator (
       }
     }
     default: {
-      package { 'python-elasticsearch-curator': ensure => $ensure }
+      package { 'python-elasticsearch-curator':
+        ensure => $ensure
+      }
     }
   }
 
-  if $manage_pip {
-    package { 'python-pip': ensure => installed }
-  }
 }
