@@ -20,10 +20,6 @@
 #   String.  Prefix for the indices. Indices that do not have this prefix are skipped.
 #   Default: logstash-
 #
-# [*separator*]
-#   String.  Time unit separator.
-#   Default: .
-#
 # [*time_unit*]
 #   String.  Unit of time to reckon by: [days, hours]
 #
@@ -116,7 +112,6 @@ define curator::job (
   $host             = 'localhost',
   $port             = 9200,
   $prefix           = 'logstash-',
-  $separator        = '.',
   $time_unit        = 'days',
   $delete_older     = undef,
   $close_older      = undef,
@@ -243,7 +238,7 @@ define curator::job (
   }
 
   cron { "curator_${name}":
-    command => "${path} --host ${host} --port ${port} -l ${logfile}${d_string}${c_string}${b_string}${o_string}${a_string}${a2_string}${s_string}${g_string} -T ${time_unit} -p '${prefix}' -s '${separator}'",
+    command => "${path} --host ${host} --port ${port} -l ${logfile}${d_string}${c_string}${b_string}${o_string}${a_string}${a2_string}${s_string}${g_string} -T ${time_unit} -p '${prefix}'",
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,
