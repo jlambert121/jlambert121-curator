@@ -10,7 +10,7 @@ describe 'curator::job', :type => :define do
 
   context 'multiple commands' do
     let(:params) { { :delete_older => 10, :bloom_older => 10 } }
-    it { expect { should raise_error(Puppet::Error) } }
+    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 -l /var/log/curator.log delete --older-than 10 -T days -p 'logstash-' && /usr/bin/curator --host localhost --port 9200 -l /var/log/curator.log bloom --older-than 10 -T days -p 'logstash-'") }
   end
 
   context 'bad curation_style' do

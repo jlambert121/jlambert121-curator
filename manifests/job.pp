@@ -136,17 +136,10 @@ define curator::job (
   $cron_minute      = 10,
 ){
 
-  $commands = [ $delete_older, $disk_space, $close_older, $bloom_older, $optimize_older, $allocation_older, $alias_older, $snapshot_older ]
-  $compacted = inline_template('<%= @commands.reject! { |e| e == :undef } %>')
+  $commands = delete_undef_values([$delete_older, $disk_space, $close_older, $bloom_older, $optimize_older, $allocation_older, $alias_older, $snapshot_older])
 
   if size($commands) == 0 {
     fail('One of delete_older, disk_space, close_older, bloom_older, optimize_older, allocation_older, alias_older, or snapshot_older is required')
-  }
-
-  if size($commands) > 1 {
-    if size($commands) == 0 {
-      fail('Only one of delete_older, disk_space, close_older, bloom_older, optimize_older, allocation_older, alias_older, or snapshot_older is allowed')
-    }
   }
 
   if !(member(['days', 'hours'], $time_unit) ){
@@ -195,9 +188,8 @@ define curator::job (
     fail("curator::job(${name}) disk_space must be an integer")
   }
 
-  $mo_string = $master_only ? {
-    true    => ' --master-only',
-    default => '',
+  if $delete_older and $disk_space {
+    fail("curator::jon(${name}) specify either delete_older or disk_space")
   }
 
   # Wow that was a lot of validation
@@ -206,56 +198,43 @@ define curator::job (
     default => '',
   }
 
-  if $delete_older {
-    $d_string = " delete --older-than ${delete_older}"
-  } else {
-    $d_string = ''
-  }
-
-  if $disk_space {
-    $g_string = " delete --disk-space ${disk_space}"
-  } else {
-    $g_string = ''
-  }
-
-  if $close_older {
-    $c_string = " close --older-than ${close_older}"
-  } else {
-    $c_string = ''
-  }
-
-  if $bloom_older {
-    $b_string = " bloom --older-than ${bloom_older}"
-  } else {
-    $b_string = ''
-  }
-
-  if $optimize_older {
-    $o_string = " optimize --older-than ${optimize_older} --max_num_segments ${max_num_segments}"
-  } else {
-    $o_string = ''
-  }
-
-  if $allocation_older {
-    $a_string = " allocation --older-than ${allocation_older} --rule ${rule}"
-  } else {
-    $a_string = ''
-  }
-
-  if $alias_older {
-    $a2_string = " alias --older-than ${alias_older} --alias ${alias_name}"
-  } else {
-    $a2_string = ''
-  }
-
-  if $snapshot_older {
-    $s_string = " snapshot --older-than ${snapshot_older} --repository ${repository}"
-  } else {
-    $s_string = ''
-  }
+  $jobs = [
+    $delete_older ? {
+      undef   => '',
+      default => "delete --older-than ${delete_older}",
+    },
+    $disk_space ? {
+      undef   => '',
+      default => "delete --disk-space ${disk_space}",
+    },
+    $close_older ? {
+      undef   => '',
+      default => "close --older-than ${close_older}",
+    },
+    $bloom_older ? {
+      undef   => '',
+      default => "bloom --older-than ${bloom_older}",
+    },
+    $optimize_older ? {
+      undef   => '',
+      default => "optimize --older-than ${optimize_older} --max_num_segments ${max_num_segments}",
+    },
+    $allocation_older ? {
+      undef   => '',
+      default => "allocation --older-than ${allocation_older} --rule ${rule}",
+    },
+    $alias_older ? {
+      undef   => '',
+      default => "alias --older-than ${alias_older} --alias ${alias_name}",
+    },
+    $snapshot_older ? {
+      undef   => '',
+      default => "snapshot --older-than ${snapshot_older} --repository ${repository}",
+    },
+  ]
 
   cron { "curator_${name}":
-    command => "${path}${mo_string} --host ${host} --port ${port} -l ${logfile}${d_string}${c_string}${b_string}${o_string}${a_string}${a2_string}${s_string}${g_string} -T ${time_unit} -p '${prefix}'",
+    command => join(suffix(prefix(reject($jobs, '^\s*$'), "${path}${mo_string} --host ${host} --port ${port} -l ${logfile} "), " -T ${time_unit} -p '${prefix}'"), ' && '),
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,
