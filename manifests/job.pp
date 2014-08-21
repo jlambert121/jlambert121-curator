@@ -195,6 +195,11 @@ define curator::job (
     fail("curator::job(${name}) disk_space must be an integer")
   }
 
+  $mo_string = $master_only ? {
+    true    => ' --master-only',
+    default => '',
+  }
+
   # Wow that was a lot of validation
   $mo_string = $master_only ? {
     true    => ' --master-only',
