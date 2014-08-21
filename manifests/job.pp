@@ -23,6 +23,10 @@
 # [*time_unit*]
 #   String.  Unit of time to reckon by: [days, hours]
 #
+# [*master_only*]
+#   Boolean.  Only run command on elected master.
+#   Default: false
+#
 # [*delete_older*]
 #   Integer.  Delete indices older than n TIME_UNITs.
 #
@@ -113,6 +117,7 @@ define curator::job (
   $port             = 9200,
   $prefix           = 'logstash-',
   $time_unit        = 'days',
+  $master_only      = false,
   $delete_older     = undef,
   $close_older      = undef,
   $bloom_older      = undef,
@@ -156,6 +161,8 @@ define curator::job (
     fail("curator::job(${name}) max_num_segments must be an integer")
   }
 
+  validate_bool($master_only)
+
   if $delete_older and !(is_integer($delete_older)) {
     fail("curator::job(${name}) delete_older must be an integer")
   }
@@ -189,6 +196,11 @@ define curator::job (
   }
 
   # Wow that was a lot of validation
+  $mo_string = $master_only ? {
+    true    => ' --master-only',
+    default => '',
+  }
+
   if $delete_older {
     $d_string = " delete --older-than ${delete_older}"
   } else {
@@ -238,7 +250,7 @@ define curator::job (
   }
 
   cron { "curator_${name}":
-    command => "${path} --host ${host} --port ${port} -l ${logfile}${d_string}${c_string}${b_string}${o_string}${a_string}${a2_string}${s_string}${g_string} -T ${time_unit} -p '${prefix}'",
+    command => "${path}${mo_string} --host ${host} --port ${port} -l ${logfile}${d_string}${c_string}${b_string}${o_string}${a_string}${a2_string}${s_string}${g_string} -T ${time_unit} -p '${prefix}'",
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,
