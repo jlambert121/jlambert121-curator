@@ -52,8 +52,8 @@ class curator (
 
   if $manage_pip {
     package { 'python-pip':
-      ensure  => installed,
-      before  => Package['elasticsearch-curator'],
+      ensure => installed,
+      before => Package['elasticsearch-curator'],
     }
   }
 
