@@ -234,7 +234,7 @@ define curator::job (
   ]
 
   cron { "curator_${name}":
-    command => join(suffix(prefix(reject($jobs, '^\s*$'), "${path}${mo_string} --host ${host} --port ${port} -l ${logfile} "), " -T ${time_unit} -p '${prefix}'"), ' && '),
+    command => join(suffix(prefix(reject($jobs, '^\s*$'), "${path}${mo_string} --host ${host} --port ${port} --logfile ${logfile} "), " --time-unit ${time_unit} --prefix '${prefix}'"), ' && '),
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,
