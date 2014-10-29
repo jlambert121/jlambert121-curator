@@ -25,7 +25,7 @@ describe 'curator::job', :type => :define do
     end
   end
 
-  [ 'disk_space', 'delete_older', 'close_older', 'bloom_older', 'optimize_older', 'allocation_older', 'snapshot_older', 'alias_older' ].each do |field|
+  [ 'disk_space', 'delete_older', 'close_older', 'bloom_older', 'optimize_older', 'allocation_older', 'snapshot_older', 'snapshot_recent', 'delete_snapshot_older', 'alias_older' ].each do |field|
     context "bad #{field}" do
       let(:prams) { { field.to_sym => 'bad' } }
       it { expect { should raise_error(Puppet::Error) } }
@@ -78,7 +78,7 @@ describe 'curator::job', :type => :define do
 
     context 'correct params' do
       let(:params) { { :snapshot_older => 10, :repository => 'test' } }
-        it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 --logfile /var/log/curator.log snapshot --older-than 10 --repository test --time-unit days --prefix 'logstash-'") }
+      it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --host localhost --port 9200 --logfile /var/log/curator.log snapshot --older-than 10 --repository test --time-unit days --prefix 'logstash-'") }
     end
   end
 
