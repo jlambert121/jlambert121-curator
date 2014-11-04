@@ -238,8 +238,8 @@ define curator::job (
   ]
 
   $time_string = $timestring ? {
-    undef   => '-T ${time_unit}',
-    default => '-T ${time_unit} --timestring ${timestring}',
+    undef   => "-T ${time_unit}",
+    default => "-T ${time_unit} --timestring ${timestring}",
   }
 
   cron { "curator_${name}":
