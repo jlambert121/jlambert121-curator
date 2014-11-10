@@ -23,6 +23,9 @@
 # [*time_unit*]
 #   String.  Unit of time to reckon by: [days, hours]
 #
+# [*timestring*]
+#   String.  Format of index time.
+#
 # [*master_only*]
 #   Boolean.  Only run command on elected master.
 #   Default: false
@@ -117,6 +120,7 @@ define curator::job (
   $port             = 9200,
   $prefix           = 'logstash-',
   $time_unit        = 'days',
+  $timestring       = undef,
   $master_only      = false,
   $delete_older     = undef,
   $close_older      = undef,
@@ -233,8 +237,13 @@ define curator::job (
     },
   ]
 
+  $time_string = $timestring ? {
+    undef   => "-T ${time_unit}",
+    default => "-T ${time_unit} --timestring ${timestring}",
+  }
+
   cron { "curator_${name}":
-    command => join(suffix(prefix(reject($jobs, '^\s*$'), "${path}${mo_string} --host ${host} --port ${port} -l ${logfile} "), " -T ${time_unit} -p '${prefix}'"), ' && '),
+    command => join(suffix(prefix(reject($jobs, '^\s*$'), "${path}${mo_string} --host ${host} --port ${port} -l ${logfile} "), " ${time_string} -p '${prefix}'"), ' && '),
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,
