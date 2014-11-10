@@ -40,6 +40,7 @@
 #
 class curator (
   $ensure       = 'latest',
+  $package_name = 'python-elasticsearch-curator',
   $provider     = undef,
   $manage_pip   = false
 ) {
@@ -52,8 +53,8 @@ class curator (
 
   if $manage_pip {
     package { 'python-pip':
-      ensure  => installed,
-      before  => Package['elasticsearch-curator'],
+      ensure => installed,
+      before => Package['elasticsearch-curator'],
     }
   }
 
@@ -65,7 +66,7 @@ class curator (
       }
     }
     default: {
-      package { 'python-elasticsearch-curator':
+      package { $package_name:
         ensure => $ensure
       }
     }

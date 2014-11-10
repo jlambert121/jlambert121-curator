@@ -11,6 +11,16 @@ describe 'curator', :type => :class do
     it { should contain_package('python-elasticsearch-curator').with(:ensure => '1.2.3') }
   end
 
+  context 'set package version and package name and use default provider' do
+    let(:params) {
+      {
+        :ensure => '1.2.3',
+        :package_name => 'elasticsearch-curator',
+      }
+    }
+    it { should contain_package('elasticsearch-curator').with(:ensure => '1.2.3') }
+  end
+
   context 'pip provider' do
     context 'with manage_pip' do
       let(:params) { { :provider => 'pip', :manage_pip => true } }
