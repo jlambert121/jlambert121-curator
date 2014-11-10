@@ -48,6 +48,12 @@
 # [*snapshot_older*]
 #   Integer.  Snapshot indices older than n TIME_UNITs.
 #
+# [*snapshot_recent*]
+#   Integer.  Snapshot indices most recent than n TIME_UNITs.
+#
+# [*snapshot_delete_older*]
+#   Integer. Delete snapshot older than n TIME_UNITs.
+#
 # [*disk_space*]
 #   Integer.  Delete indices beyond n GIGABYTES.
 #
@@ -112,28 +118,30 @@
 # Copyright 2014 EvenUp.
 #
 define curator::job (
-  $path             = '/usr/bin/curator',
-  $host             = 'localhost',
-  $port             = 9200,
-  $prefix           = 'logstash-',
-  $time_unit        = 'days',
-  $master_only      = false,
-  $delete_older     = undef,
-  $close_older      = undef,
-  $bloom_older      = undef,
-  $optimize_older   = undef,
-  $allocation_older = undef,
-  $alias_older      = undef,
-  $snapshot_older   = undef,
-  $disk_space       = undef,
-  $alias_name       = undef,
-  $repository       = undef,
-  $rule             = undef,
-  $max_num_segments = 2,
-  $logfile          = '/var/log/curator.log',
-  $cron_weekday     = '*',
-  $cron_hour        = 1,
-  $cron_minute      = 10,
+  $path                  = '/usr/bin/curator',
+  $host                  = 'localhost',
+  $port                  = 9200,
+  $prefix                = 'logstash-',
+  $time_unit             = 'days',
+  $master_only           = false,
+  $delete_older          = undef,
+  $close_older           = undef,
+  $bloom_older           = undef,
+  $optimize_older        = undef,
+  $allocation_older      = undef,
+  $alias_older           = undef,
+  $snapshot_older        = undef,
+  $snapshot_recent       = undef,
+  $snapshot_delete_older = undef,
+  $disk_space            = undef,
+  $alias_name            = undef,
+  $repository            = undef,
+  $rule                  = undef,
+  $max_num_segments      = 2,
+  $logfile               = '/var/log/curator.log',
+  $cron_weekday          = '*',
+  $cron_hour             = 1,
+  $cron_minute           = 10,
 ){
 
   $commands = delete_undef_values([$delete_older, $disk_space, $close_older, $bloom_older, $optimize_older, $allocation_older, $alias_older, $snapshot_older])
@@ -184,6 +192,14 @@ define curator::job (
     fail("curator::job(${name}) snapshot_older must be an integer")
   }
 
+  if $snapshot_recent and !(is_integer($snapshot_recent)) {
+    fail("curator::job(${name}) snapshot_recent must be an integer")
+  }
+
+  if $snapshot_delete_older and !(is_integer($snapshot_delete_older)) {
+    fail("curator::job(${name}) snapshot_delete_older must be an integer")
+  }
+
   if $disk_space and !(is_integer($disk_space)) {
     fail("curator::job(${name}) disk_space must be an integer")
   }
@@ -231,10 +247,18 @@ define curator::job (
       undef   => '',
       default => "snapshot --older-than ${snapshot_older} --repository ${repository}",
     },
+    $snapshot_delete_older ? {
+      undef   => '',
+      default => "snapshot --delete-older-than ${snapshot_delete_older} --repository ${repository}",
+    },
+    $snapshot_recent ? {
+      undef   => '',
+      default => "snapshot --most-recent ${snapshot_recent} --repository ${repository}",
+    },
   ]
 
   cron { "curator_${name}":
-    command => join(suffix(prefix(reject($jobs, '^\s*$'), "${path}${mo_string} --host ${host} --port ${port} -l ${logfile} "), " -T ${time_unit} -p '${prefix}'"), ' && '),
+    command => join(suffix(prefix(reject($jobs, '^\s*$'), "${path}${mo_string} --host ${host} --port ${port} --logfile ${logfile} "), " --time-unit ${time_unit} --prefix '${prefix}'"), ' && '),
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,
