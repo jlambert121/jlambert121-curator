@@ -100,11 +100,12 @@ describe 'curator::job', :type => :define do
       :port         => 1000,
       :prefix       => 'example',
       :time_unit    => 'hours',
+      :timestring   => '%Y%m%d%h',
       :logfile      => '/data/curator.log',
       :master_only  => true,
       :delete_older => 10
     } }
-    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --master-only --host es.mycompany.com --port 1000 --logfile /data/curator.log delete --older-than 10 --time-unit hours --prefix 'example'") }
+    it { should contain_cron('curator_myjob').with(:command => "/usr/bin/curator --master-only --host es.mycompany.com --port 1000 --logfile /data/curator.log delete --older-than 10 --time-unit hours --timestring '%Y%m%d%h' --prefix 'example'") }
   end
 
 end
