@@ -1,5 +1,5 @@
 name 'evenup-curator'
-version '1.0.1'
+version '1.1.0'
 author 'Justin Lambert <jlambert@letsevenup.com>'
 license 'Apache'
 summary 'Installs elasticsearch curator and schedules cron jobs'
