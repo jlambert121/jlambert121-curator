@@ -4,7 +4,7 @@
 #
 # === Parameters
 #
-# [*path*]
+# [*curator_path*]
 #   String.  Location of the curator binary
 #   Default: /usr/bin/curator
 #
@@ -121,7 +121,7 @@
 # Copyright 2014 EvenUp.
 #
 define curator::job (
-  $path                  = '/usr/bin/curator',
+  $curator_path          = '/usr/bin/curator',
   $host                  = 'localhost',
   $port                  = 9200,
   $prefix                = 'logstash-',
@@ -149,7 +149,7 @@ define curator::job (
 ){
 
   if $curator::provider == 'virtualenv' {
-    $path = "source ${curator::virtualenv_path}/bin/activate && ${curator::virtualenv_path}/bin/curator"
+    $curator_path = "source ${curator::virtualenv_path}/bin/activate && ${curator::virtualenv_path}/bin/curator"
     $cron_environment = 'SHELL=/usr/bin/env bash'
   } else {
     $cron_environment = undef
@@ -274,7 +274,7 @@ define curator::job (
   ]
 
   cron { "curator_${name}":
-    command     => join(suffix(prefix(reject($jobs, '^\s*$'), "${path}${mo_string} --host ${host} --port ${port} --logfile ${logfile} "), " ${time_string} --prefix '${prefix}'"), ' && '),
+    command     => join(suffix(prefix(reject($jobs, '^\s*$'), "${curator_path}${mo_string} --host ${host} --port ${port} --logfile ${logfile} "), " ${time_string} --prefix '${prefix}'"), ' && '),
     environment => $cron_environment,
     hour        => $cron_hour,
     minute      => $cron_minute,
