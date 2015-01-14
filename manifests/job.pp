@@ -148,6 +148,13 @@ define curator::job (
   $cron_minute           = 10,
 ){
 
+  if $curator::provider == 'virtualenv' {
+    $path = "source ${curator::virtualenv_path}/bin/activate && ${curator::virtualenv_path}/bin/curator"
+    $cron_environment = 'SHELL=/usr/bin/env bash'
+  } else {
+    $cron_environment = undef
+  }
+
   $commands = delete_undef_values([$delete_older, $disk_space, $close_older, $bloom_older, $optimize_older, $allocation_older, $alias_older, $snapshot_older])
 
   if size($commands) == 0 {
@@ -267,10 +274,11 @@ define curator::job (
   ]
 
   cron { "curator_${name}":
-    command => join(suffix(prefix(reject($jobs, '^\s*$'), "${path}${mo_string} --host ${host} --port ${port} --logfile ${logfile} "), " ${time_string} --prefix '${prefix}'"), ' && '),
-    hour    => $cron_hour,
-    minute  => $cron_minute,
-    weekday => $cron_weekday,
+    command     => join(suffix(prefix(reject($jobs, '^\s*$'), "${path}${mo_string} --host ${host} --port ${port} --logfile ${logfile} "), " ${time_string} --prefix '${prefix}'"), ' && '),
+    environment => $cron_environment,
+    hour        => $cron_hour,
+    minute      => $cron_minute,
+    weekday     => $cron_weekday,
   }
 
 }
