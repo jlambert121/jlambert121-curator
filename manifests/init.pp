@@ -67,10 +67,10 @@ class curator (
     }
     virtualenv: {
       validate_absolute_path($virtualenv_path)
-      if ! $python::pip {
+      if ! defined('python::pip') {
         fail ( 'You need to set the python::pip class parameter to true.' )
       }
-      if ! $python::virtualenv {
+      if ! defined('python::virtualenv') {
         fail ( 'You need to set the python::virtualenv class parameter to true.' )
       }
       python::virtualenv { $virtualenv_path:
