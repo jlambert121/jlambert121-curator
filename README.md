@@ -39,8 +39,8 @@ Install via pip
 Install in a virtualenv via pip
 ```puppet
   class { 'curator':
-  provider        => 'virtualenv',
-  virtualenv_path => '/opt/elasticsearch-curator',
+    provider        => 'virtualenv',
+    virtualenv_path => '/opt/elasticsearch-curator',
   }
 ```
 You'll need to use the include the
