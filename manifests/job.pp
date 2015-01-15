@@ -149,6 +149,9 @@ define curator::job (
 ){
 
   if $curator::provider == 'virtualenv' {
+    if ! defined(Class['curator']) {
+      fail('You must include the curator class before using the curator::job defined type with provider "virtualenv"')
+    }
     $command_line = "source ${curator::virtualenv_path}/bin/activate && ${curator::virtualenv_path}/bin/curator"
     $cron_environment = 'SHELL=/usr/bin/env bash'
   } else {
