@@ -39,10 +39,11 @@
 # Copyright 2014 EvenUp.
 #
 class curator (
-  $ensure       = 'latest',
-  $package_name = 'python-elasticsearch-curator',
-  $provider     = undef,
-  $manage_pip   = false
+  $ensure          = 'latest',
+  $package_name    = 'python-elasticsearch-curator',
+  $provider        = undef,
+  $virtualenv_path = '/opt/elasticsearch-curator',
+  $manage_pip      = false
 ) {
 
   if ( $ensure != 'latest' or $ensure != 'absent' ) {
@@ -51,18 +52,43 @@ class curator (
     }
   }
 
-  if $manage_pip {
-    package { 'python-pip':
-      ensure => installed,
-      before => Package['elasticsearch-curator'],
-    }
-  }
-
   case $provider {
     pip: {
+      if $manage_pip {
+        package { 'python-pip':
+          ensure => installed,
+          before => Package['elasticsearch-curator'],
+        }
+      }
       package { 'elasticsearch-curator':
         ensure   => $ensure,
         provider => pip,
+      }
+    }
+    virtualenv: {
+      validate_absolute_path($virtualenv_path)
+      if ! defined('python') {
+        fail('You must include the python class before using the curator class with provider virtualenv')
+      }
+      if ! defined('python::pip') {
+        fail ('You need to set the python::pip class parameter to true.')
+      }
+      if ! defined('python::virtualenv') {
+        fail ('You need to set the python::virtualenv class parameter to true.')
+      }
+      python::virtualenv { $virtualenv_path:
+        owner => 'root',
+        group => 'root',
+      }
+      python::pip { 'python-pip-elasticsearch':
+        pkgname    => 'elasticsearch',
+        virtualenv => $virtualenv_path,
+        owner      => 'root',
+      }
+      python::pip { 'python-pip-elasticsearch-curator':
+        pkgname    => 'elasticsearch-curator',
+        virtualenv => $virtualenv_path,
+        owner      => 'root',
       }
     }
     default: {
