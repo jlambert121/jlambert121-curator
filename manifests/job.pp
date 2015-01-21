@@ -5,7 +5,7 @@
 # === Parameters
 #
 # [*path*]
-#   String.  Location of the curator binary
+#   String.  Command to call curator
 #   Default: /usr/bin/curator
 #
 # [*host*]
@@ -148,6 +148,17 @@ define curator::job (
   $cron_minute           = 10,
 ){
 
+  if $curator::provider == 'virtualenv' {
+    if ! defined('curator') {
+      fail('You must include the curator class before using the curator::job defined type with provider "virtualenv"')
+    }
+    $command_line = "source ${curator::virtualenv_path}/bin/activate && ${curator::virtualenv_path}/bin/curator"
+    $cron_environment = 'SHELL=/usr/bin/bash'
+  } else {
+    $command_line = $path
+    $cron_environment = undef
+  }
+
   $commands = delete_undef_values([$delete_older, $disk_space, $close_older, $bloom_older, $optimize_older, $allocation_older, $alias_older, $snapshot_older])
 
   if size($commands) == 0 {
@@ -267,10 +278,11 @@ define curator::job (
   ]
 
   cron { "curator_${name}":
-    command => join(suffix(prefix(reject($jobs, '^\s*$'), "${path}${mo_string} --host ${host} --port ${port} --logfile ${logfile} "), " ${time_string} --prefix '${prefix}'"), ' && '),
-    hour    => $cron_hour,
-    minute  => $cron_minute,
-    weekday => $cron_weekday,
+    command     => join(suffix(prefix(reject($jobs, '^\s*$'), "${command_line}${mo_string} --host ${host} --port ${port} --logfile ${logfile} "), " ${time_string} --prefix '${prefix}'"), ' && '),
+    environment => $cron_environment,
+    hour        => $cron_hour,
+    minute      => $cron_minute,
+    weekday     => $cron_weekday,
   }
 
 }

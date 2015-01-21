@@ -36,6 +36,17 @@ Install via pip
   }
 ```
 
+Install in a virtualenv via pip
+```puppet
+  class { 'curator':
+    provider        => 'virtualenv',
+    virtualenv_path => '/opt/elasticsearch-curator',
+    }
+```
+
+You'll need to use the include the [stankevich/python](https://forge.puppetlabs.com/stankevich/python) module in your manifests and ensure the **pip** and **virtualenv** parameters are set to *true*.
+
+
 Disable bloom filters on indexes over 2 days old
 ```puppet
   curator::job { 'logstash_bloom':
