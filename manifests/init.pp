@@ -14,10 +14,6 @@
 #            If not specified will use system's default provider.
 #   Default: undef
 #
-# [*manage_pip*]
-#   Bool.  If true require the pip package. If false do nothing.
-#   Default: false
-#
 # === Examples
 #
 # * Installation:
@@ -33,43 +29,21 @@
 #
 # * Justin Lambert <mailto:jlambert@letsevenup.com>
 #
-#
-# === Copyright
-#
-# Copyright 2014 EvenUp.
-#
 class curator (
   $ensure       = 'latest',
-  $package_name = 'python-elasticsearch-curator',
-  $provider     = undef,
-  $manage_pip   = false
+  $package_name = 'elasticsearch-curator',
+  $provider     = 'pip',
 ) {
 
   if ( $ensure != 'latest' or $ensure != 'absent' ) {
-    if versioncmp($ensure, '1.1.0') < 0 {
-      fail('This version of the module only supports version 1.1.0 or later of curator')
+    if versioncmp($ensure, '3.0.0') < 0 {
+      fail('This version of the module only supports version 3.0.0 or later of curator')
     }
   }
 
-  if $manage_pip {
-    package { 'python-pip':
-      ensure => installed,
-      before => Package['elasticsearch-curator'],
-    }
-  }
-
-  case $provider {
-    pip: {
-      package { 'elasticsearch-curator':
-        ensure   => $ensure,
-        provider => pip,
-      }
-    }
-    default: {
-      package { $package_name:
-        ensure => $ensure
-      }
-    }
+  package { $package_name:
+    ensure   => $ensure,
+    provider => $provider,
   }
 
 }

@@ -116,158 +116,242 @@
 #
 # * Justin Lambert <mailto:jlambert@letsevenup.com>
 #
-# === Copyright
-#
-# Copyright 2014 EvenUp.
-#
 define curator::job (
-  $path                  = '/usr/bin/curator',
+  $command,
+  $sub_command           = 'indices',
+  $path                  = '/bin/curator',
+
+  # ES config
   $host                  = 'localhost',
   $port                  = 9200,
+
+  # Options for all indexes
   $prefix                = 'logstash-',
+  $suffix                = undef,
+  $regex                 = undef,
+  $exclude               = undef,
+  $index                 = undef,
+  $snapshot              = undef,
+  $older_than            = undef,
+  $newer_than            = undef,
   $time_unit             = 'days',
   $timestring            = undef,
   $master_only           = false,
-  $delete_older          = undef,
-  $close_older           = undef,
-  $bloom_older           = undef,
-  $optimize_older        = undef,
-  $allocation_older      = undef,
-  $alias_older           = undef,
-  $snapshot_older        = undef,
-  $snapshot_recent       = undef,
-  $snapshot_delete_older = undef,
-  $disk_space            = undef,
-  $alias_name            = undef,
-  $repository            = undef,
-  $rule                  = undef,
-  $max_num_segments      = 2,
   $logfile               = '/var/log/curator.log',
+  $log_level             = 'INFO',
+  $logformat             = 'default',
+
+  # Alias options
+  $alias_name            = undef,
+  $remove                = false,
+
+  # Allocation options
+  $rule                  = undef,
+
+  # Delete options
+  $disk_space            = undef,
+
+  # Optimize options
+  $delay                 = 0,
+  $max_num_segments      = 2,
+  $request_timeout       = 218600,
+
+  # Replicas options
+  $count                 = 2,
+
+  # Snapshot options
+  $repository            = undef,
+
+  # Cron params
   $cron_weekday          = '*',
   $cron_hour             = 1,
   $cron_minute           = 10,
 ){
 
-  $commands = delete_undef_values([$delete_older, $disk_space, $close_older, $bloom_older, $optimize_older, $allocation_older, $alias_older, $snapshot_older])
+  # Validations and set index options
 
-  if size($commands) == 0 {
-    fail('One of delete_older, disk_space, close_older, bloom_older, optimize_older, allocation_older, alias_older, or snapshot_older is required')
+  if $prefix {
+    $_prefix = "--prefix '${prefix}'"
+  } else {
+    $_prefix = undef
   }
 
-  if !(member(['days', 'hours'], $time_unit) ){
-    fail("curator::job(${name}) time_unit must be 'days' or 'hours'")
+  if $suffix {
+    $_suffix = "--suffix '${suffix}'"
+  } else {
+    $_suffix = undef
   }
 
-  if !(is_integer($port)) {
-    fail("curator::job(${name}) port must be integer")
+  if $regex {
+    $_regex = "--regex '${regex}'"
+  } else {
+    $_regex = undef
   }
 
-  if !(is_integer($max_num_segments)) {
-    fail("curator::job(${name}) max_num_segments must be an integer")
+  if $timestring {
+    $_timestring = "--timestring '${timestring}'"
+  } else {
+    $_timestring = ''
+  }
+
+  if !member(['days', 'hours', 'weeks', 'months'], $time_unit) {
+    fail("curator::job[${name}] time_unit must be 'days' or 'hours'")
+  } else {
+    $_time_unit = "--time-unit ${time_unit}"
+  }
+
+  if !is_integer($port) {
+    fail("curator::job[${name}] port must be integer")
+  }
+
+  if $exclude {
+    if !is_string($exclude) and !is_array($exclude) {
+      fail("curator::job[${name}]: exclude must be an array or array of strings")
+    } else {
+      $_exclude = inline_template("Array(@exclude).map { |element| \"--exclude #{element}\" }.join(' ')")
+    }
+  } else {
+    $_exclude = undef
+  }
+
+  if $index {
+    if !is_string($index) and !is_array($index) {
+      fail("curator::job[${name}]: index must be an array or array of strings")
+    } else {
+      $_index = inline_template("Array(@index).map { |element| \"--exclude #{element}\" }.join(' ')")
+    }
+  } else {
+    $_index = undef
+  }
+
+  if $snapshot {
+    if !is_string($snapshot) and !is_array($snapshot) {
+      fail("curator::job[${name}]: snapshot must be an array or array of strings")
+    } else {
+      $_snapshot = inline_template("Array(@snapshot).map { |element| \"--exclude #{element}\" }.join(' ')")
+    }
+  } else {
+    $_snapshot = undef
   }
 
   validate_bool($master_only)
 
-  if $delete_older and !(is_integer($delete_older)) {
-    fail("curator::job(${name}) delete_older must be an integer")
+  if $older_than {
+    if !is_integer($older_than) {
+      fail("curator::job[${name}] older_than must be an integer")
+    } else {
+      $_older_than = "--older-than ${older_than}"
+    }
+  } else {
+    $_older_than = undef
   }
 
-  if $close_older and !(is_integer($close_older)) {
-    fail("curator::job(${name}) close_older must be an integer")
+  if $newer_than {
+    if !is_integer($newer_than) {
+      fail("curator::job[${name}] newer_than must be an integer")
+    } else {
+      $_newer_than = "--newer-than ${newer_than}"
+    }
+  } else {
+    $_newer_than = undef
   }
 
-  if $bloom_older and !(is_integer($bloom_older)) {
-    fail("curator::job(${name}) bloom_older must be an integer")
+  if !member(['default', 'logstash'], $logformat) {
+    fail("curator::job[${name}] logformat must be default or logstash")
   }
 
-  if $optimize_older and !(is_integer($optimize_older)) {
-    fail("curator::job(${name}) optimize_older must be an integer")
+  if !member(['INFO', 'WARN'], $log_level) {
+    fail("curator::job[${name}] log_level must be INFO or WARN")
   }
 
-  if $allocation_older and !(is_integer($allocation_older)) {
-    fail("curator::job(${name}) allocation_older must be an integer")
+
+  case $command {
+    'alias': {
+      # alias validations
+      if !$alias_name {
+        fail("curator::job[${name}] alias_name is required with alias")
+      }
+      validate_bool($remove)
+
+      $exec = "alias --name ${alias_name} --remove ${remove} indices"
+    }
+    'allocation': {
+      # allocation validations
+      if !$rule {
+        fail("curator::job[${name}] rule is required with allocation")
+      }
+
+      $exec = "allocation --rule ${rule} indicies"
+    }
+    'close', 'open': {
+      $exec = $command
+    }
+    'delete': {
+      # delete validations
+      if !member(['indices', 'snapshots'], $sub_command) {
+        fail("curator::job[${name}] delete command supports indices and snapshots sub_command")
+      }
+      if $disk_space {
+        if !is_integer($disk_space) {
+        } else {
+          $_ds = " --disk-space ${disk_space}"
+        }
+      } else {
+        $_ds = ''
+      }
+
+      $exec = "delete${_ds}"
+    }
+    'optimize': {
+      # optimize validations
+      if !is_integer($delay) {
+        fail("curator::job[${name}] delay must be an integer")
+      } else {
+        $_delay = " --delay ${delay}"
+      }
+
+      if !is_integer($max_num_segments) {
+        fail("curator::job[${name}] max_num_segments must be an integer")
+      } else {
+        $_segments = " --max_num_segments ${max_num_segments}"
+      }
+
+      if !is_integer($request_timeout) {
+        fail("curator::job[${name}] request_timeout must be an integer")
+      } else {
+        $_timeout = " --request_timeout ${request_timeout}"
+      }
+
+      $exec = "optimize${_delay}${_segments}${_timeout} indices"
+    }
+    'replicas': {
+      if !is_integer($count) {
+        fail("curator::job[${name}] count must be an integer")
+      }
+
+      $exec = "replicas --count ${count} indices"
+    }
+    'snapshot': {
+      if !$repository {
+        fail("curator::job[${name}] repository is required")
+      }
+
+      $exec = "snapshot --repository ${repository}"
+    }
+    default: {
+      fail("curator::job[${name}]: command must be alias, allocation, bloom, close, delete, open, optimize, replicas, or snapshot")
+    }
   }
 
-  if $alias_older and !(is_integer($alias_older)) {
-    fail("curator::job(${name}) alias_older must be an integer")
-  }
-
-  if $snapshot_older and !(is_integer($snapshot_older)) {
-    fail("curator::job(${name}) snapshot_older must be an integer")
-  }
-
-  if $snapshot_recent and !(is_integer($snapshot_recent)) {
-    fail("curator::job(${name}) snapshot_recent must be an integer")
-  }
-
-  if $snapshot_delete_older and !(is_integer($snapshot_delete_older)) {
-    fail("curator::job(${name}) snapshot_delete_older must be an integer")
-  }
-
-  if $disk_space and !(is_integer($disk_space)) {
-    fail("curator::job(${name}) disk_space must be an integer")
-  }
-
-  if $delete_older and $disk_space {
-    fail("curator::jon(${name}) specify either delete_older or disk_space")
-  }
-
-  # Wow that was a lot of validation
   $mo_string = $master_only ? {
     true    => ' --master-only',
     default => '',
   }
 
-  $time_string = $timestring ? {
-    undef   => "--time-unit ${time_unit}",
-    default => "--time-unit ${time_unit} --timestring '${timestring}'",
-  }
-
-  $jobs = [
-    $delete_older ? {
-      undef   => '',
-      default => "delete --older-than ${delete_older}",
-    },
-    $disk_space ? {
-      undef   => '',
-      default => "delete --disk-space ${disk_space}",
-    },
-    $close_older ? {
-      undef   => '',
-      default => "close --older-than ${close_older}",
-    },
-    $bloom_older ? {
-      undef   => '',
-      default => "bloom --older-than ${bloom_older}",
-    },
-    $optimize_older ? {
-      undef   => '',
-      default => "optimize --older-than ${optimize_older} --max_num_segments ${max_num_segments}",
-    },
-    $allocation_older ? {
-      undef   => '',
-      default => "allocation --older-than ${allocation_older} --rule ${rule}",
-    },
-    $alias_older ? {
-      undef   => '',
-      default => "alias --older-than ${alias_older} --alias ${alias_name}",
-    },
-    $snapshot_older ? {
-      undef   => '',
-      default => "snapshot --older-than ${snapshot_older} --repository ${repository}",
-    },
-    $snapshot_delete_older ? {
-      undef   => '',
-      default => "snapshot --delete-older-than ${snapshot_delete_older} --repository ${repository}",
-    },
-    $snapshot_recent ? {
-      undef   => '',
-      default => "snapshot --most-recent ${snapshot_recent} --repository ${repository}",
-    },
-  ]
+  $index_options = join(delete_undef_values([$_prefix, $_suffix, $_regex, $_time_unit, $_exclude, $_index, $_snapshot, $_older_than, $_newer_than, $_timestring]), ' ')
 
   cron { "curator_${name}":
-    command => join(suffix(prefix(reject($jobs, '^\s*$'), "${path}${mo_string} --host ${host} --port ${port} --logfile ${logfile} "), " ${time_string} --prefix '${prefix}'"), ' && '),
+    command => "${path}${mo_string} --host ${host} --port ${port} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat} ${exec} ${index_options}",
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,
