@@ -1,0 +1,19 @@
+{
+  "name": "evenup-curator",
+  "version": "1.1.0",
+  "author": "Justin Lambert <jlambert@letsevenup.com>",
+  "license": "Apache-2.0",
+  "summary": "Installs elasticsearch curator and schedules cron jobs",
+  "source": "https://github.com/evenup/evenup-curator",
+  "project_page": "https://github.com/evenup/evenup-curator",
+  "issues_url": "https://github.com/evenup/evenup-curator/issues",
+  "tags": ["curator", "elasticsearch"],
+  "operatingsystem_support": [
+    { "operatingsystem": "RedHat", "operatingsystemrelease": [ "6", "7" ] },
+    { "operatingsystem": "CentOS", "operatingsystemrelease": [ "6", "7" ] },
+    { "operatingsystem": "Ubuntu", "operatingsystemrelease": [ "10.04", "12.04", "14.04" ] }
+  ],
+  "dependencies": [
+    { "name": "puppetlabs/stdlib", "version_requirement": ">=4.2.0 <5.0.0" }
+  ]
+}
