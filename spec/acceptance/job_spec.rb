@@ -6,6 +6,11 @@ describe 'curator jobs' do
     it 'should work idempotently with no errors' do
       pp = <<-EOS
       class { 'curator': }
+      curator::job { 'test':
+        command => 'replicas',
+        host    => 'elasticsearch.company.org',
+        count   => 4,
+      }
       EOS
 
       # Run it twice and test for idempotency
@@ -13,10 +18,9 @@ describe 'curator jobs' do
       apply_manifest(pp, :catch_changes  => true)
     end
 
-    describe command('which makemework') do
-      its(:exit_status) { should eq 0 }
+    describe cron() do
+      it { should have_entry "10 1 * * * /bin/curator --host elasticsearch.company.org --port 9200 --logfile /var/log/curator.log --loglevel INFO --logformat default replicas --count 4 indices --prefix 'logstash-' --time-unit days" }
     end
-
   end
 
 end
