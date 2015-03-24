@@ -2,6 +2,7 @@ require 'spec_helper'
 
 describe 'curator::job', :type => :define do
   let(:title) { 'myjob' }
+  let(:pre_condition) { 'include curator' }
 
   context 'invalid command' do
     let(:params) { { :command => 'invalid' } }
