@@ -33,6 +33,7 @@ class curator (
   $ensure       = 'latest',
   $package_name = 'elasticsearch-curator',
   $provider     = 'pip',
+  $bin_file     = '/bin/curator',
 ) {
 
   if ( $ensure != 'latest' or $ensure != 'absent' ) {

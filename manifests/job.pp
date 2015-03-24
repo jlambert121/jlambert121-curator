@@ -2,115 +2,6 @@
 #
 # Schedules an elasticsearch curator maintainence job
 #
-# === Parameters
-#
-# [*path*]
-#   String.  Location of the curator binary
-#   Default: /usr/bin/curator
-#
-# [*host*]
-#   String.  Elasticsearch host
-#   Default: localhost
-#
-# [*port*]
-#   Integer.  Elasticsearch port
-#   Default: 9200
-#
-# [*prefix*]
-#   String.  Prefix for the indices. Indices that do not have this prefix are skipped.
-#   Default: logstash-
-#
-# [*time_unit*]
-#   String.  Unit of time to reckon by: [days, hours]
-#
-# [*timestring*]
-#   String.  Format of index time.
-#
-# [*master_only*]
-#   Boolean.  Only run command on elected master.
-#   Default: false
-#
-# [*delete_older*]
-#   Integer.  Delete indices older than n TIME_UNITs.
-#
-# [*close_older*]
-#   Integer.  Close indicies older than n TIME_UNITs.
-#
-# [*bloom_older*]
-#   Integer.  Disable bloom filter for indicies older than n TIME_UNITs
-#
-# [*optimize_older*]
-#   Integer.  Optimize (Lucene forceMerge) indices older than n TIME_UNITs.
-#
-# [*allocation_older*]
-#   Integer.  Allocate indices older than n TIME_UNITs based on rule.
-#
-# [*alias_older*]
-#   Integer.  Add aliases to indices older than n TIME_UNITs.
-#
-# [*snapshot_older*]
-#   Integer.  Snapshot indices older than n TIME_UNITs.
-#
-# [*snapshot_recent*]
-#   Integer.  Snapshot indices most recent than n TIME_UNITs.
-#
-# [*snapshot_delete_older*]
-#   Integer. Delete snapshot older than n TIME_UNITs.
-#
-# [*disk_space*]
-#   Integer.  Delete indices beyond n GIGABYTES.
-#
-# [*alias_name*]
-#   String.  Alias to add to indicies when using alias_order
-#
-# [*repository*]
-#   String.  Respository to create snapshots in
-#
-# [*rule*]
-#   String.  Rule to apply for allocations
-#
-# [*max_num_segments*]
-#   Integer.  Maximum number of segments, post-optimize.
-#   Default: 2
-#
-# [*logfile*]
-#   String.  Logfile to write the output log to
-#   Defalut: /var/log/curator.log
-#
-# [*cron_weekday*]
-#   Cron.  Day of the week to schedule the cron entry
-#   Default: *
-#
-# [*cron_hour*]
-#   Cron.  Hour of the day to schedule the cron entry
-#   Default: 1
-#
-# [*cron_minute*]
-#   Cron.  Minute of the hour to schedule the cron entry
-#   Default: 10
-#
-#
-#
-# === Examples
-#
-# Daily job that deletes all indicies over 30 days
-#   curator::job { 'delete_job':
-#     delete_older  => 30
-#   }
-#
-# Daily job to perform "light" tasks, weekly job to optimize
-#   curator::job { 'light_job':
-#     delete_older  => 120,
-#     close_older   => 30,
-#     bloom_older   => 7,
-#     cron_hour     => 23,
-#     cron_minute   => 30,
-#   }
-#   curator::job { 'weekly_optimize':
-#     optimize_older  => 7,
-#     cron_weekday    => 6,
-#     cron_hour       => 11
-#   }
 #
 # === Authors
 #
@@ -119,7 +10,7 @@
 define curator::job (
   $command,
   $sub_command           = 'indices',
-  $path                  = '/bin/curator',
+  $bin_file              = $::curator::bin_file,
 
   # ES config
   $host                  = 'localhost',
@@ -168,6 +59,8 @@ define curator::job (
   $cron_minute           = 10,
 ){
 
+  include curator
+
   # Validations and set index options
 
   if $prefix {
@@ -195,7 +88,7 @@ define curator::job (
   }
 
   if !member(['days', 'hours', 'weeks', 'months'], $time_unit) {
-    fail("curator::job[${name}] time_unit must be 'days' or 'hours'")
+    fail("curator::job[${name}] time_unit must be hours, days, weeks, or months")
   } else {
     $_time_unit = "--time-unit ${time_unit}"
   }
@@ -351,7 +244,7 @@ define curator::job (
   $index_options = join(delete_undef_values([$_prefix, $_suffix, $_regex, $_time_unit, $_exclude, $_index, $_snapshot, $_older_than, $_newer_than, $_timestring]), ' ')
 
   cron { "curator_${name}":
-    command => "${path}${mo_string} --host ${host} --port ${port} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat} ${exec} ${index_options}",
+    command => "${bin_file}${mo_string} --host ${host} --port ${port} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat} ${exec} ${index_options}",
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,

@@ -1,3 +1,5 @@
+  Updated for curator >= 3.0.0
+  Reworked job defined type - no longer supports multiple jobs
 20141119 - v1.1.0
   Added support for --timestring parameter (bflad)
   Added snapshot_recent, snapshot_delete_order (phononet)
