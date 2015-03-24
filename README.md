@@ -118,7 +118,39 @@ Default: pip
 
 String.  Location of the curator binary
 
-Default: '/bin/curator'
+Default: /bin/curator
+
+#####`host`
+
+String.  ES host.  Inherited/used by curator::job
+
+Default: localhost
+
+#####`port`
+
+Integer.  Port ES is listening on.  Inherited/used by curator::job
+
+Default: 9200
+
+#####`logfile`
+
+String.  Logfile to write the output log to.  Inherited/used by curator::job
+
+Defalut: /var/log/curator.log
+
+#####`log_level`
+
+String.  Logging level.  Inherited/used by curator::job
+
+Default: INFO
+
+#####`logformat`
+
+String.  Log format to write logs in.  Inherited/used by curator::job
+
+Default: default
+
+Valid values: default, logstash
 
 #### Define: curator::job
 

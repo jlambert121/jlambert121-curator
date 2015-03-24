@@ -13,8 +13,8 @@ define curator::job (
   $bin_file              = $::curator::bin_file,
 
   # ES config
-  $host                  = 'localhost',
-  $port                  = 9200,
+  $host                  = $::curator::host,
+  $port                  = $::curator::port,
 
   # Options for all indexes
   $prefix                = 'logstash-',
@@ -28,9 +28,9 @@ define curator::job (
   $time_unit             = 'days',
   $timestring            = undef,
   $master_only           = false,
-  $logfile               = '/var/log/curator.log',
-  $log_level             = 'INFO',
-  $logformat             = 'default',
+  $logfile               = $::curator::logfile,
+  $log_level             = $::curator::log_level,
+  $logformat             = $::curator::logformat,
 
   # Alias options
   $alias_name            = undef,

@@ -30,11 +30,16 @@
 # * Justin Lambert <mailto:jlambert@letsevenup.com>
 #
 class curator (
-  $ensure       = 'latest',
-  $package_name = 'elasticsearch-curator',
-  $provider     = 'pip',
-  $bin_file     = '/bin/curator',
-) {
+  $ensure       = $::curator::params::ensure,
+  $package_name = $::curator::params::package_name,
+  $provider     = $::curator::params::provider,
+  $bin_file     = $::curator::params::bin_file,
+  $host         = $::curator::params::host,
+  $port         = $::curator::params::port,
+  $logfile      = $::curator::params::logfile,
+  $log_level    = $::curator::params::log_level,
+  $logformat    = $::curator::params::logformat,
+) inherits curator::params {
 
   if ( $ensure != 'latest' or $ensure != 'absent' ) {
     if versioncmp($ensure, '3.0.0') < 0 {
