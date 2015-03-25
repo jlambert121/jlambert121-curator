@@ -71,7 +71,7 @@ describe 'curator::job', :type => :define do
 
     context 'with disk_space' do
       let(:params) { { :command => 'delete', :disk_space => '1024' } }
-      it { should contain_cron('curator_myjob').with(:command => /delete --disk-space 1024/ ) }
+      it { should contain_cron('curator_myjob').with(:command => /delete --disk-space 1024 indices/ ) }
     end
   end
 
@@ -134,7 +134,7 @@ describe 'curator::job', :type => :define do
      :logformat    => 'logstash',
      :master_only  => true
    } }
-   it { should contain_cron('curator_myjob').with(:command => "/bin/curator --master-only --host es.mycompany.com --port 1000 --logfile /data/curator.log --loglevel WARN --logformat logstash open --prefix 'example' --time-unit hours --timestring '%Y%m%d%h'") }
+   it { should contain_cron('curator_myjob').with(:command => "/bin/curator --master-only --host es.mycompany.com --port 1000 --logfile /data/curator.log --loglevel WARN --logformat logstash open indices --prefix 'example' --time-unit hours --timestring '%Y%m%d%h'") }
  end
 
 end

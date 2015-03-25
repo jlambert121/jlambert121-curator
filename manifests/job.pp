@@ -170,10 +170,10 @@ define curator::job (
         fail("curator::job[${name}] rule is required with allocation")
       }
 
-      $exec = "allocation --rule ${rule} indicies"
+      $exec = "allocation --rule ${rule} indices"
     }
     'close', 'open': {
-      $exec = $command
+      $exec = "${command} indices"
     }
     'delete': {
       # delete validations
@@ -189,7 +189,7 @@ define curator::job (
         $_ds = ''
       }
 
-      $exec = "delete${_ds}"
+      $exec = "delete${_ds} ${sub_command}"
     }
     'optimize': {
       # optimize validations
@@ -225,7 +225,7 @@ define curator::job (
         fail("curator::job[${name}] repository is required")
       }
 
-      $exec = "snapshot --repository ${repository}"
+      $exec = "snapshot --repository ${repository} indices"
     }
     default: {
       fail("curator::job[${name}]: command must be alias, allocation, bloom, close, delete, open, optimize, replicas, or snapshot")
