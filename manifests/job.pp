@@ -26,7 +26,7 @@ define curator::job (
   $older_than            = undef,
   $newer_than            = undef,
   $time_unit             = 'days',
-  $timestring            = undef,
+  $timestring            = '%Y.%m.%d',
   $master_only           = false,
   $logfile               = $::curator::logfile,
   $log_level             = $::curator::log_level,
@@ -81,11 +81,7 @@ define curator::job (
     $_regex = undef
   }
 
-  if $timestring {
-    $_timestring = "--timestring '${timestring}'"
-  } else {
-    $_timestring = ''
-  }
+  $_timestring = "--timestring '${timestring}'"
 
   if !member(['days', 'hours', 'weeks', 'months'], $time_unit) {
     fail("curator::job[${name}] time_unit must be hours, days, weeks, or months")

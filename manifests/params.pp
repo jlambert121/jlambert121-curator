@@ -1,3 +1,7 @@
+# Class curator::params
+#
+# Default configuration for curator module
+#
 class curator::params {
   $ensure       = 'latest'
   $package_name = 'elasticsearch-curator'
