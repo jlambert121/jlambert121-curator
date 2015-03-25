@@ -21,7 +21,7 @@ A puppet module for installing and configuring [elastic-curator](https://github.
 
 ## Module Description
 
-Curator is used to manaage and clean up time-series elasticsearch indexes, this module manages curator.
+Curator is used to manage and clean up time-series elasticsearch indexes, this module manages curator.
 
 NOTE: If you are using curator < 3.0.0 use a previous version of this module.
 
