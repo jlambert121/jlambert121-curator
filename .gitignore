@@ -7,4 +7,3 @@ spec/fixtures/
 .vagrant/
 .bundle/
 coverage/
-log/
