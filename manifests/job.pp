@@ -59,7 +59,7 @@ define curator::job (
   $cron_minute           = 10,
 ){
 
-  include curator
+  include ::curator
 
   # Validations and set index options
 
@@ -182,14 +182,12 @@ define curator::job (
       }
       if $disk_space {
         if !is_integer($disk_space) {
-        } else {
-          $_ds = " --disk-space ${disk_space}"
+          fail("curator::job[${name}] disk_space must be an integer")
         }
+        $exec = "delete --disk-space ${disk_space} ${sub_command}"
       } else {
-        $_ds = ''
+        $exec = "delete ${sub_command}"
       }
-
-      $exec = "delete${_ds} ${sub_command}"
     }
     'optimize': {
       # optimize validations
