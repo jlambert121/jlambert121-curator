@@ -238,7 +238,7 @@ define curator::job (
   $index_options = join(delete_undef_values([$_prefix, $_suffix, $_regex, $_time_unit, $_exclude, $_index, $_snapshot, $_older_than, $_newer_than, $_timestring]), ' ')
 
   cron { "curator_${name}":
-    command => "${bin_file}${mo_string} --host ${host} --port ${port} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat} ${exec} ${index_options}",
+    command => "${bin_file} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat}${mo_string} --host ${host} --port ${port} ${exec} ${index_options}",
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,
