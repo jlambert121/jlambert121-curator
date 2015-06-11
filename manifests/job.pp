@@ -184,10 +184,16 @@ define curator::job (
         if !is_integer($disk_space) {
           fail("curator::job[${name}] disk_space must be an integer")
         }
-        $exec = "delete --disk-space ${disk_space} ${sub_command}"
+        $_ds = "--disk-space ${disk_space} "
       } else {
-        $exec = "delete ${sub_command}"
+        $_ds = ''
       }
+      if $repository {
+        $_repo = " --repository ${repository}"
+      } else {
+        $_repo = ''
+      }
+      $exec = "delete ${_ds}${sub_command}${_repo}"
     }
     'optimize': {
       # optimize validations

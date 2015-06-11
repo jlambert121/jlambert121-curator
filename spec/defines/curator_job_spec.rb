@@ -73,6 +73,11 @@ describe 'curator::job', :type => :define do
       let(:params) { { :command => 'delete', :disk_space => '1024' } }
       it { should contain_cron('curator_myjob').with(:command => /delete --disk-space 1024 indices/ ) }
     end
+
+    context 'with repository' do
+      let(:params) { { :command => 'delete', :repository => 'old' } }
+      it { should contain_cron('curator_myjob').with(:command => /delete indices --repository old/)}
+    end
   end
 
   context 'optimize' do
