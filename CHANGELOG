@@ -1,4 +1,7 @@
-201503425 - v2.0.1
+20150616 - v2.0.0
+  Correct logfile parameter location (SteveDevOps)
+  Support repository flag on delete
+20150325 - v2.0.1
   Correct some command strings
   Ensure timestring is included
 20150324 - v2.0.0 
