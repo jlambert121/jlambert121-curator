@@ -97,7 +97,7 @@ define curator::job (
     if !is_string($exclude) and !is_array($exclude) {
       fail("curator::job[${name}]: exclude must be an array or array of strings")
     } else {
-      $_exclude = inline_template("Array(@exclude).map { |element| \"--exclude #{element}\" }.join(' ')")
+      $_exclude = inline_template("<%= Array(@exclude).map { |element| \"--exclude #{element}\" }.join(' ') %>")
     }
   } else {
     $_exclude = undef
@@ -107,7 +107,7 @@ define curator::job (
     if !is_string($index) and !is_array($index) {
       fail("curator::job[${name}]: index must be an array or array of strings")
     } else {
-      $_index = inline_template("Array(@index).map { |element| \"--exclude #{element}\" }.join(' ')")
+      $_index = inline_template("<%= Array(@index).map { |element| \"--index #{element}\" }.join(' ') %>")
     }
   } else {
     $_index = undef
@@ -117,7 +117,7 @@ define curator::job (
     if !is_string($snapshot) and !is_array($snapshot) {
       fail("curator::job[${name}]: snapshot must be an array or array of strings")
     } else {
-      $_snapshot = inline_template("Array(@snapshot).map { |element| \"--exclude #{element}\" }.join(' ')")
+      $_snapshot = inline_template("<%= Array(@snapshot).map { |element| \"--snapshot #{element}\" }.join(' ') %>")
     }
   } else {
     $_snapshot = undef
@@ -152,7 +152,6 @@ define curator::job (
   if !member(['INFO', 'WARN'], $log_level) {
     fail("curator::job[${name}] log_level must be INFO or WARN")
   }
-
 
   case $command {
     'alias': {

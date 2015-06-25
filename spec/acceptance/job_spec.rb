@@ -19,7 +19,7 @@ describe 'curator jobs' do
     end
 
     describe cron() do
-      it { should have_entry "10 1 * * * /bin/curator --host elasticsearch.company.org --port 9200 --logfile /var/log/curator.log --loglevel INFO --logformat default replicas --count 4 indices --prefix 'logstash-' --time-unit days" }
+      it { should have_entry "10 1 * * * /bin/curator --logfile /var/log/curator.log --loglevel INFO --logformat default --host elasticsearch.company.org --port 9200 replicas --count 4 indices --prefix 'logstash-' --time-unit days --timestring '\%Y.\%m.\%d'" }
     end
   end
 
