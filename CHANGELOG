@@ -1,4 +1,7 @@
-20150616 - v2.0.0
+20150625 - v2.1.1
+  Correct inline_templates
+  Correct timestring (SteveDevOps)
+20150616 - v2.1.0
   Correct logfile parameter location (SteveDevOps)
   Support repository flag on delete
 20150325 - v2.0.1

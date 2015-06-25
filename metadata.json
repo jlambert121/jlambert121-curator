@@ -1,6 +1,6 @@
 {
   "name": "evenup-curator",
-  "version": "2.1.0",
+  "version": "2.1.1",
   "author": "Justin Lambert <jlambert@letsevenup.com>",
   "license": "Apache-2.0",
   "summary": "Installs elasticsearch curator and schedules cron jobs",
