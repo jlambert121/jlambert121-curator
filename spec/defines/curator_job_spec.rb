@@ -22,7 +22,7 @@ describe 'curator::job', :type => :define do
 
     context 'valid params' do
       let(:params) { { :command => 'alias', :alias_name => 'archive', :remove => true } }
-      it { should contain_cron('curator_myjob').with(:command => /alias --name archive --remove true/) }
+      it { should contain_cron('curator_myjob').with(:command => /alias --name archive --remove/) }
     end
   end
 
