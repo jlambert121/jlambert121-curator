@@ -159,9 +159,14 @@ define curator::job (
       if !$alias_name {
         fail("curator::job[${name}] alias_name is required with alias")
       }
-      validate_bool($remove)
-
-      $exec = "alias --name ${alias_name} --remove ${remove} indices"
+      if $remove {
+        validate_bool($remove)
+        $_remove = ' --remove'
+      } else {
+        $_remove = ''
+      }
+      
+      $exec = "alias --name ${alias_name}${_remove} indices"
     }
     'allocation': {
       # allocation validations
