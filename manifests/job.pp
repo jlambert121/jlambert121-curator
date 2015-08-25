@@ -237,7 +237,7 @@ define curator::job (
       $exec = "snapshot --repository ${repository} indices"
     }
     default: {
-      fail("curator::job[${name}]: command must be alias, allocation, bloom, close, delete, open, optimize, replicas, or snapshot")
+      fail("curator::job[${name}]: command must be alias, allocation, close, delete, open, optimize, replicas, or snapshot")
     }
   }
 

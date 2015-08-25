@@ -160,7 +160,7 @@ Manages cron entires for curator jobs
 
 String.  Curator command to run.
 
-Valid options: alias, allocation, bloom, close, delete, open, optimize, replicas, or snapshot
+Valid options: alias, allocation, close, delete, open, optimize, replicas, or snapshot
 
 #####`bin_file`
 
