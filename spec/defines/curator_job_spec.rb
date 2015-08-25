@@ -9,6 +9,11 @@ describe 'curator::job', :type => :define do
     it { expect { should raise_error(Puppet::Error) } }
   end
 
+  context 'ensure absent' do
+    let(:params) { { :command => 'alias', :alias_name => 'archive', :ensure => 'absent' } }
+    it { should contain_cron('curator_myjob').with(:ensure => 'absent') }
+  end
+
   context 'alias' do
     context 'missing alias_name' do
       let(:params) { { :command => 'alias' } }
