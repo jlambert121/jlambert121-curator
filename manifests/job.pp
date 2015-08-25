@@ -9,6 +9,7 @@
 #
 define curator::job (
   $command,
+  $ensure                = 'present',
   $sub_command           = 'indices',
   $bin_file              = $::curator::bin_file,
 
@@ -165,7 +166,7 @@ define curator::job (
       } else {
         $_remove = ''
       }
-      
+
       $exec = "alias --name ${alias_name}${_remove} indices"
     }
     'allocation': {
@@ -248,6 +249,7 @@ define curator::job (
   $index_options = join(delete_undef_values([$_prefix, $_suffix, $_regex, $_time_unit, $_exclude, $_index, $_snapshot, $_older_than, $_newer_than, $_timestring]), ' ')
 
   cron { "curator_${name}":
+    ensure  => $ensure,
     command => "${bin_file} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat}${mo_string} --host ${host} --port ${port} ${exec} ${index_options} >/dev/null",
     hour    => $cron_hour,
     minute  => $cron_minute,
