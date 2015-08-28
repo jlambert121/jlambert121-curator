@@ -1,3 +1,6 @@
+20150828 - v2.1.2
+  Fixed remove parameter in alias (zyronix)
+  Send cron stdout to /dev/null (mjs510)
 20150625 - v2.1.1
   Correct inline_templates
   Correct timestring (SteveDevOps)
