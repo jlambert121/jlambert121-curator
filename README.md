@@ -186,6 +186,12 @@ Boolean. Use ssl when connecting to Elasticsearch.
 
 Default: false
 
+####`ssl_validate`
+
+Boolean. Don't validate the ssl certificate
+
+Default: false
+
 ####`http_auth`
 
 Boolean. Use basic auth when connecting to Elasticsearch.

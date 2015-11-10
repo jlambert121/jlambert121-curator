@@ -9,10 +9,19 @@
 #   String.  Version of curator to be installed
 #   Default: latest
 #
+# [*manage_repo*]
+#   Boolean. Enable repo management by enabling the official repositories.
+#   Default: false
+#
 # [*provider*]
 #   String.  Name of the provider to install the package with.
 #            If not specified will use system's default provider.
 #   Default: undef
+#
+# [*repo_version*]
+#   String.  Elastic repositories  are versioned per major release (2, 3)
+#            select here which version you want.
+#   Default: false
 #
 # === Examples
 #
@@ -39,6 +48,8 @@ class curator (
   $logfile      = $::curator::params::logfile,
   $log_level    = $::curator::params::log_level,
   $logformat    = $::curator::params::logformat,
+  $manage_repo  = $::curator::params::manage_repo,
+  $repo_version = $::curator::params::repo_version,
 ) inherits curator::params {
 
   if ( $ensure != 'latest' or $ensure != 'absent' ) {
@@ -47,9 +58,44 @@ class curator (
     }
   }
 
-  package { $package_name:
-    ensure   => $ensure,
-    provider => $provider,
+  case $manage_repo {
+    true: {
+      case $::osfamily {
+        'Debian': {
+          $_package_name = 'python-elasticsearch-curator'
+          $_provider     = 'apt'
+        }
+        'RedHat': {
+          $_package_name = 'python-elasticsearch-curator'
+          $_provider     = 'yum'
+        }
+        default: {
+          $_package_name = 'elasticsearch-curator'
+          $_provider     = 'pip'
+        }
+      }
+    }
+    default: {
+      $_package_name = $package_name
+      $_provider     = $provider
+    }
   }
 
+  validate_bool($manage_repo)
+
+  if ($manage_repo == true) {
+    validate_string($repo_version)
+
+    # Set up repositories
+    class { '::curator::repo': } ->
+    package { $_package_name:
+      ensure   => $ensure,
+      provider => $_provider,
+    }
+  } else {
+    package { $_package_name:
+      ensure   => $ensure,
+      provider => $_provider,
+    }
+  }
 }
