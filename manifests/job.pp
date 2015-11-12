@@ -17,6 +17,12 @@ define curator::job (
   $host                  = $::curator::host,
   $port                  = $::curator::port,
 
+  # Auth options
+  $use_ssl               = false,
+  $http_auth             = false,
+  $user                  = undef,
+  $password              = undef,
+
   # Options for all indexes
   $prefix                = 'logstash-',
   $suffix                = undef,
@@ -246,11 +252,24 @@ define curator::job (
     default => '',
   }
 
+  $ssl_string = $use_ssl ? {
+    true    => ' --use_ssl',
+    default => '',
+  }
+
+  if $http_auth {
+    validate_string($user)
+    validate_string($password)
+    $auth_string = " --http_auth ${user}:${password}"
+  } else {
+    $auth_string = ''
+  }
+
   $index_options = join(delete_undef_values([$_prefix, $_suffix, $_regex, $_time_unit, $_exclude, $_index, $_snapshot, $_older_than, $_newer_than, $_timestring]), ' ')
 
   cron { "curator_${name}":
     ensure  => $ensure,
-    command => "${bin_file} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat}${mo_string} --host ${host} --port ${port} ${exec} ${index_options} >/dev/null",
+    command => "${bin_file} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat}${mo_string}${ssl_string}${auth_string} --host ${host} --port ${port} ${exec} ${index_options} >/dev/null",
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,

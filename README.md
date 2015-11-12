@@ -180,6 +180,30 @@ Integer.  Elasticsearch port
 
 Default: 9200
 
+####`use_ssl`
+
+Boolean. Use ssl when connecting to Elasticsearch.
+
+Default: false
+
+####`http_auth`
+
+Boolean. Use basic auth when connecting to Elasticsearch.
+
+Default: false
+
+####`user`
+
+String. User name for the http_auth argument.  Required if `http_auth=true`.
+
+Default: undef
+
+####`password`
+
+String. Password for the http_auth argument.  Required if `http_auth=true`.
+
+Default: undef
+
 #####`prefix`
 
 String.  Prefix for the indices. Indices that do not have this prefix are skipped.
