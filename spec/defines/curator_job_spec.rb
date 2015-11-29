@@ -125,6 +125,21 @@ describe 'curator::job', :type => :define do
       it { expect { should raise_error(Puppet::Error) } }
     end
 
+    context 'missing http_auth params' do
+      let(:params) { { :command => 'snapshot', :repository => 'archive', :http_auth => true } }
+      it { expect { should raise_error(Puppet::Error) } }
+    end
+
+    context 'valid http_auth' do
+      let(:params) { { :command => 'snapshot', :repository => 'archive', :http_auth => true, :user => 'user', :password => 'password' } }
+      it { should contain_cron('curator_myjob').with(:command => /--http_auth user:password/) }
+    end
+
+    context 'use_ssl' do
+      let(:params) { { :command => 'snapshot', :repository => 'archive', :use_ssl => true } }
+      it { should contain_cron('curator_myjob').with(:command => /--use_ssl/) }
+    end
+
     context 'valid params' do
       let(:params) { { :command => 'snapshot', :repository => 'archive' } }
       it { should contain_cron('curator_myjob').with(:command => /snapshot --repository archive/) }
@@ -142,9 +157,13 @@ describe 'curator::job', :type => :define do
      :logfile      => '/data/curator.log',
      :log_level    => 'WARN',
      :logformat    => 'logstash',
-     :master_only  => true
+     :master_only  => true,
+     :use_ssl      => true,
+     :http_auth    => true,
+     :user         => 'user',
+     :password     => 'password'
    } }
-   it { should contain_cron('curator_myjob').with(:command => "/bin/curator --logfile /data/curator.log --loglevel WARN --logformat logstash --master-only --host es.mycompany.com --port 1000 open indices --prefix 'example' --time-unit hours --timestring '%Y%m%d%h' >/dev/null") }
+   it { should contain_cron('curator_myjob').with(:command => "/bin/curator --logfile /data/curator.log --loglevel WARN --logformat logstash --master-only --use_ssl --http_auth user:password --host es.mycompany.com --port 1000 open indices --prefix 'example' --time-unit hours --timestring '%Y%m%d%h' >/dev/null") }
  end
 
 end
