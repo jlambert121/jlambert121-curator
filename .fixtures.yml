@@ -1,5 +1,8 @@
 fixtures:
   forge_modules:
+    apt:
+      repo: "puppetlabs/apt"
+      ref: "2.2.0"
     stdlib:
       repo: "puppetlabs/stdlib"
       ref: "4.2.0"

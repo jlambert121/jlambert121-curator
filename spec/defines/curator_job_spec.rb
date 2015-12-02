@@ -9,6 +9,11 @@ describe 'curator::job', :type => :define do
     it { expect { should raise_error(Puppet::Error) } }
   end
 
+  context 'port is valid' do
+    let(:params) { { :port => 'string' } }
+    it { expect { should raise_error(Puppet::Error) } }
+  end
+
   context 'ensure absent' do
     let(:params) { { :command => 'alias', :alias_name => 'archive', :ensure => 'absent' } }
     it { should contain_cron('curator_myjob').with(:ensure => 'absent') }
@@ -140,6 +145,11 @@ describe 'curator::job', :type => :define do
       it { should contain_cron('curator_myjob').with(:command => /--use_ssl/) }
     end
 
+    context 'ssl_validate' do
+      let(:params) { { :command => 'snapshot', :repository => 'archive', :use_ssl => true, :ssl_validate => false } }
+      it { should contain_cron('curator_myjob').with(:command => /--use_ssl --ssl-no-validate/) }
+    end
+
     context 'valid params' do
       let(:params) { { :command => 'snapshot', :repository => 'archive' } }
       it { should contain_cron('curator_myjob').with(:command => /snapshot --repository archive/) }
@@ -159,11 +169,12 @@ describe 'curator::job', :type => :define do
      :logformat    => 'logstash',
      :master_only  => true,
      :use_ssl      => true,
+     :ssl_validate => false,
      :http_auth    => true,
      :user         => 'user',
      :password     => 'password'
    } }
-   it { should contain_cron('curator_myjob').with(:command => "/bin/curator --logfile /data/curator.log --loglevel WARN --logformat logstash --master-only --use_ssl --http_auth user:password --host es.mycompany.com --port 1000 open indices --prefix 'example' --time-unit hours --timestring '%Y%m%d%h' >/dev/null") }
+   it { should contain_cron('curator_myjob').with(:command => "/bin/curator --logfile /data/curator.log --loglevel WARN --logformat logstash --master-only --use_ssl --ssl-no-validate --http_auth user:password --host es.mycompany.com --port 1000 open indices --prefix 'example' --time-unit hours --timestring '%Y%m%d%h' >/dev/null") }
  end
 
 end
