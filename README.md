@@ -180,31 +180,31 @@ Integer.  Elasticsearch port
 
 Default: 9200
 
-####`use_ssl`
+#####`use_ssl`
 
 Boolean. Use ssl when connecting to Elasticsearch.
 
 Default: false
 
-####`ssl_validate`
+#####`ssl_validate`
 
 Boolean. Don't validate the ssl certificate
 
 Default: false
 
-####`http_auth`
+#####`http_auth`
 
 Boolean. Use basic auth when connecting to Elasticsearch.
 
 Default: false
 
-####`user`
+#####`user`
 
 String. User name for the http_auth argument.  Required if `http_auth=true`.
 
 Default: undef
 
-####`password`
+#####`password`
 
 String. Password for the http_auth argument.  Required if `http_auth=true`.
 
