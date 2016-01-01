@@ -77,6 +77,22 @@ Delete marvel indexes older than a week
   }
 ```
 
+Use hiera for your jobs
+```puppet
+curator::jobs:
+  logstash_close:
+    command: close
+    older_than: 2
+    cron_hour: 2
+    cron_minute: 20
+  marvel_delete:
+    command: delete
+    prefix: '.marvel'
+    older_than: 7
+    cron_hour: 7
+    cron_minute: 20
+```
+
 Currently this package supports installing curator via pip or your local
 package manager.  RPM packages can easly be created by running:
 

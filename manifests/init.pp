@@ -9,6 +9,11 @@
 #   String.  Version of curator to be installed
 #   Default: latest
 #
+# [*jobs*]
+#
+#   Hash. Manage your jobs in hiera (or manifest).
+#   Default: {}
+#
 # [*manage_repo*]
 #   Boolean. Enable repo management by enabling the official repositories.
 #   Default: false
@@ -45,6 +50,7 @@ class curator (
   $bin_file     = $::curator::params::bin_file,
   $host         = $::curator::params::host,
   $port         = $::curator::params::port,
+  $jobs         = $::curator::params::jobs,
   $logfile      = $::curator::params::logfile,
   $log_level    = $::curator::params::log_level,
   $logformat    = $::curator::params::logformat,
@@ -81,7 +87,10 @@ class curator (
     }
   }
 
+  validate_hash($jobs)
   validate_bool($manage_repo)
+
+  create_resources('curator::job', $jobs)
 
   if ($manage_repo == true) {
     validate_string($repo_version)
