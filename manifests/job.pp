@@ -14,11 +14,11 @@ define curator::job (
   $port                  = $::curator::port,
 
   # Auth options
-  $use_ssl               = false,
-  $ssl_validate          = false,
-  $http_auth             = false,
-  $user                  = undef,
-  $password              = undef,
+  $use_ssl               = $::curator::use_ssl,
+  $ssl_validate          = $::curator::ssl_validate,
+  $http_auth             = $::curator::http_auth,
+  $user                  = $::curator::user,
+  $password              = $::curator::password,
 
   # Options for all indexes
   $prefix                = 'logstash-',

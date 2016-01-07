@@ -31,32 +31,61 @@ describe 'curator', :type => :class do
     it { should_not contain_curator__job() }
   end
 
+  context 'add a job using globals' do
+    let(:params) {
+      {
+        :http_auth            => true,
+        :jobs                 => {
+          'delete_job' => {
+            'command'     => 'close',
+            'cron_hour'   => 6,
+            'master_only' => true,
+            'older_than'  => 7
+          }
+        },
+        :password             => 'password',
+        :use_ssl              =>  true,
+        :user                 => 'user',
+      }
+    }
+    it { should contain_curator__job('delete_job').with({
+      'command'              => 'close',
+      'cron_hour'            => 6,
+      'http_auth'            => true,
+      'master_only'          => true,
+      'older_than'           => 7,
+      'password'             => 'password',
+      'use_ssl'              => true,
+      'user'                 => 'user',
+    }) }
+  end
+
   context 'add a job' do
     let(:params) {
       {
         :jobs => {
           'delete_job' => {
-            'command'     => 'close',
-            'cron_hour'   => 6,
-            'http_auth'   => true,
-            'master_only' => true,
-            'older_than'  => 7,
-            'password'    => 'password',
-            'use_ssl'     =>  true,
-            'user'        => 'user',
+            'command'              => 'close',
+            'cron_hour'            => 6,
+            'http_auth'            => true,
+            'master_only'          => true,
+            'older_than'           => 7,
+            'password'             => 'password',
+            'use_ssl'              =>  true,
+            'user'                 => 'user',
           }
         }
       }
     }
     it { should contain_curator__job('delete_job').with({
-      'command' => 'close',
-      'cron_hour'   => 6,
-      'http_auth'   => true,
-      'master_only' => true,
-      'older_than'  => 7,
-      'password'    => 'password',
-      'use_ssl'     => true,
-      'user'        => 'user',
+      'command'              => 'close',
+      'cron_hour'            => 6,
+      'http_auth'            => true,
+      'master_only'          => true,
+      'older_than'           => 7,
+      'password'             => 'password',
+      'use_ssl'              => true,
+      'user'                 => 'user',
     }) }
   end
 end

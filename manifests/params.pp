@@ -13,6 +13,11 @@ class curator::params {
   $bin_file     = '/bin/curator'
   $host         = 'localhost'
   $port         = 9200
+  $use_ssl      = false
+  $ssl_validate = false
+  $http_auth    = false
+  $user         = undef
+  $password     = undef
   $jobs         = {}
   $logfile      = '/var/log/curator.log'
   $log_level    = 'INFO'
