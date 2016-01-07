@@ -44,6 +44,7 @@ describe 'curator', :type => :class do
           }
         },
         :password             => 'password',
+        :ssl_certificate_path => '/path/to/cert.pem',
         :use_ssl              =>  true,
         :user                 => 'user',
       }
@@ -55,6 +56,7 @@ describe 'curator', :type => :class do
       'master_only'          => true,
       'older_than'           => 7,
       'password'             => 'password',
+      'ssl_certificate_path' => '/path/to/cert.pem',
       'use_ssl'              => true,
       'user'                 => 'user',
     }) }
@@ -71,6 +73,7 @@ describe 'curator', :type => :class do
             'master_only'          => true,
             'older_than'           => 7,
             'password'             => 'password',
+            'ssl_certificate_path' => '/path/to/cert.pem',
             'use_ssl'              =>  true,
             'user'                 => 'user',
           }
@@ -84,6 +87,7 @@ describe 'curator', :type => :class do
       'master_only'          => true,
       'older_than'           => 7,
       'password'             => 'password',
+      'ssl_certificate_path' => '/path/to/cert.pem',
       'use_ssl'              => true,
       'user'                 => 'user',
     }) }

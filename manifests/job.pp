@@ -16,6 +16,7 @@ define curator::job (
   # Auth options
   $use_ssl               = $::curator::use_ssl,
   $ssl_validate          = $::curator::ssl_validate,
+  $ssl_certificate_path  = $::curator::ssl_certificate_path,
   $http_auth             = $::curator::http_auth,
   $user                  = $::curator::user,
   $password              = $::curator::password,
@@ -260,6 +261,11 @@ define curator::job (
     } else {
       $ssl_no_validate = ' --ssl-no-validate'
     }
+    if $ssl_certificate_path != undef {
+      $ssl_certificate = " --certificate ${ssl_certificate_path}"
+    } else {
+      $ssl_certificate = ''
+    }
   }
 
   if $http_auth {
@@ -274,7 +280,7 @@ define curator::job (
 
   cron { "curator_${name}":
     ensure  => $ensure,
-    command => "${bin_file} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat}${mo_string}${ssl_string}${ssl_no_validate}${auth_string} --host ${host} --port ${port} ${exec} ${index_options} >/dev/null",
+    command => "${bin_file} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat}${mo_string}${ssl_string}${ssl_certificate}${ssl_no_validate}${auth_string} --host ${host} --port ${port} ${exec} ${index_options} >/dev/null",
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,
