@@ -1,12 +1,12 @@
 {
-  "name": "evenup-curator",
+  "name": "jlambert121-curator",
   "version": "2.1.2",
-  "author": "Justin Lambert <jlambert@letsevenup.com>",
+  "author": "Justin Lambert <jlambert@eml.cc>",
   "license": "Apache-2.0",
   "summary": "Installs elasticsearch curator and schedules cron jobs",
-  "source": "https://github.com/evenup/evenup-curator",
-  "project_page": "https://github.com/evenup/evenup-curator",
-  "issues_url": "https://github.com/evenup/evenup-curator/issues",
+  "source": "https://github.com/jlambert121/jlambert121-curator",
+  "project_page": "https://github.com/jlambert121/jlambert121-curator",
+  "issues_url": "https://github.com/jlambert121/jlambert121-curator/issues",
   "tags": ["curator", "elasticsearch"],
   "operatingsystem_support": [
     { "operatingsystem": "RedHat", "operatingsystemrelease": [ "6", "7" ] },

@@ -3,10 +3,6 @@
 # Schedules an elasticsearch curator maintainence job
 #
 #
-# === Authors
-#
-# * Justin Lambert <mailto:jlambert@letsevenup.com>
-#
 define curator::job (
   $command,
   $ensure                = 'present',

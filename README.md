@@ -1,5 +1,5 @@
-[![Puppet Forge](http://img.shields.io/puppetforge/v/evenup/curator.svg)](https://forge.puppetlabs.com/evenup/curator)
-[![Build Status](https://travis-ci.org/evenup/evenup-curator.png?branch=master)](https://travis-ci.org/evenup/evenup-curator)
+[![Puppet Forge](http://img.shields.io/puppetforge/v/jlambert121/curator.svg)](https://forge.puppetlabs.com/jlambert121/curator)
+[![Build Status](https://travis-ci.org/jlambert121/jlambert121-curator.png?branch=master)](https://travis-ci.org/jlambert121/jlambert121-curator)
 
 #### Table of Contents
 
@@ -38,7 +38,7 @@ NOTE: If you are using curator < 3.0.0 use a previous version of this module.
 Installation of the curator module:
 
 ```
-  puppet module install evenup-curator
+  puppet module install jlambert121-curator
 ```
 
 ## Usage
@@ -376,12 +376,12 @@ Default: 10
 
 ## Development
 
-Improvements and bug fixes are greatly appreciated.  See the [contributing guide](https://github.com/evenup/evenup-curator/CONTRIBUTING.md) for
+Improvements and bug fixes are greatly appreciated.  See the [contributing guide](https://github.com/jlambert121/jlambert121-curator/CONTRIBUTING.md) for
 information on adding and validating tests for PRs.
 
 
 ## Changelog / Contributors
 
-[Changelog](https://github.com/evenup/evenup-curator/blob/master/CHANGELOG)
+[Changelog](https://github.com/jlambert121/jlambert121-curator/blob/master/CHANGELOG)
 
-[Contributors](https://github.com/evenup/evenup-curator/graphs/contributors)
+[Contributors](https://github.com/jlambert121/jlambert121-curator/graphs/contributors)

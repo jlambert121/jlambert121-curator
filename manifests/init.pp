@@ -39,10 +39,6 @@
 #       manage_pip => true,
 #     }
 #
-# === Authors
-#
-# * Justin Lambert <mailto:jlambert@letsevenup.com>
-#
 class curator (
   $ensure       = $::curator::params::ensure,
   $package_name = $::curator::params::package_name,
