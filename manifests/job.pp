@@ -166,12 +166,12 @@ define curator::job (
       }
       if $remove {
         validate_bool($remove)
-        $_remove = ' --remove'
+        $_remove = '--remove'
       } else {
-        $_remove = ''
+        $_remove = undef
       }
 
-      $exec = "alias --name ${alias_name}${_remove} indices"
+      $exec = join(delete_undef_values(["alias --name ${alias_name}", $_remove, 'indices']), ' ')
     }
     'allocation': {
       # allocation validations
@@ -193,16 +193,17 @@ define curator::job (
         if !is_integer($disk_space) {
           fail("curator::job[${name}] disk_space must be an integer")
         }
-        $_ds = "--disk-space ${disk_space} "
+        $_ds = "--disk-space ${disk_space}"
       } else {
-        $_ds = ''
+        $_ds = undef
       }
       if $repository {
-        $_repo = " --repository ${repository}"
+        $_repo = "--repository ${repository}"
       } else {
-        $_repo = ''
+        $_repo = undef
       }
-      $exec = "delete ${_ds}${sub_command}${_repo}"
+
+      $exec = join(delete_undef_values(['delete', $_ds, $sub_command, $_repo]), ' ')
     }
     'optimize': {
       # optimize validations
@@ -246,41 +247,42 @@ define curator::job (
   }
 
   $mo_string = $master_only ? {
-    true    => ' --master-only',
-    default => '',
+    true    => '--master-only',
+    default => undef,
   }
 
   $ssl_string = $use_ssl ? {
-    true    => ' --use_ssl',
-    default => '',
+    true    => '--use_ssl',
+    default => undef,
   }
 
   if $use_ssl {
     if $ssl_validate {
-      $ssl_no_validate = ''
+      $ssl_no_validate = undef
     } else {
-      $ssl_no_validate = ' --ssl-no-validate'
+      $ssl_no_validate = '--ssl-no-validate'
     }
     if $ssl_certificate_path != undef {
-      $ssl_certificate = " --certificate ${ssl_certificate_path}"
+      $ssl_certificate = "--certificate ${ssl_certificate_path}"
     } else {
-      $ssl_certificate = ''
+      $ssl_certificate = undef
     }
   }
 
   if $http_auth {
     validate_string($user)
     validate_string($password)
-    $auth_string = " --http_auth ${user}:${password}"
+    $auth_string = "--http_auth ${user}:${password}"
   } else {
-    $auth_string = ''
+    $auth_string = undef
   }
 
   $index_options = join(delete_undef_values([$_prefix, $_suffix, $_regex, $_time_unit, $_exclude, $_index, $_snapshot, $_older_than, $_newer_than, $_timestring]), ' ')
+  $options = join(delete_undef_values([$mo_string, $ssl_string, $ssl_certificate, $ssl_no_validate, $auth_string]), ' ')
 
   cron { "curator_${name}":
     ensure  => $ensure,
-    command => "${bin_file} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat}${mo_string}${ssl_string}${ssl_certificate}${ssl_no_validate}${auth_string} --host ${host} --port ${port} ${exec} ${index_options} >/dev/null",
+    command => "${bin_file} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat} ${options} --host ${host} --port ${port} ${exec} ${index_options} >/dev/null",
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,

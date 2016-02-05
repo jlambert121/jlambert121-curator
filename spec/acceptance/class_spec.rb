@@ -1,7 +1,6 @@
 require 'spec_helper_acceptance'
 
 describe 'curator class' do
-
   context 'defaults' do
     if fact('osfamily') == 'RedHat'
       it 'adds epel to and installs pip' do
@@ -34,7 +33,5 @@ describe 'curator class' do
     describe command('which curator') do
       its(:exit_status) { should eq 0 }
     end
-
   end
-
 end

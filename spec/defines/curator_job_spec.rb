@@ -156,25 +156,27 @@ describe 'curator::job', :type => :define do
     end
   end
 
- context 'set all other params' do
-   let(:params) { {
-     :command      => 'open',
-     :host         => 'es.mycompany.com',
-     :port         => 1000,
-     :prefix       => 'example',
-     :time_unit    => 'hours',
-     :timestring   => '%Y%m%d%h',
-     :logfile      => '/data/curator.log',
-     :log_level    => 'WARN',
-     :logformat    => 'logstash',
-     :master_only  => true,
-     :use_ssl      => true,
-     :ssl_validate => false,
-     :http_auth    => true,
-     :user         => 'user',
-     :password     => 'password'
-   } }
-   it { should contain_cron('curator_myjob').with(:command => "/bin/curator --logfile /data/curator.log --loglevel WARN --logformat logstash --master-only --use_ssl --ssl-no-validate --http_auth user:password --host es.mycompany.com --port 1000 open indices --prefix 'example' --time-unit hours --timestring '%Y%m%d%h' >/dev/null") }
- end
-
+  context 'set all other params' do
+    let(:params) do
+      {
+        :command      => 'open',
+        :host         => 'es.mycompany.com',
+        :port         => 1000,
+        :prefix       => 'example',
+        :time_unit    => 'hours',
+        :timestring   => '%Y%m%d%h',
+        :logfile      => '/data/curator.log',
+        :log_level    => 'WARN',
+        :logformat    => 'logstash',
+        :master_only  => true,
+        :use_ssl      => true,
+        :ssl_validate => false,
+        :http_auth    => true,
+        :user         => 'user',
+        :password     => 'password'
+      }
+    end
+    
+    it { should contain_cron('curator_myjob').with(:command => "/bin/curator --logfile /data/curator.log --loglevel WARN --logformat logstash --master-only --use_ssl --ssl-no-validate --http_auth user:password --host es.mycompany.com --port 1000 open indices --prefix 'example' --time-unit hours --timestring '%Y%m%d%h' >/dev/null") }
+  end
 end
