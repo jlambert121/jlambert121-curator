@@ -10,11 +10,17 @@ class curator::params {
   $repo_version = false
 
   # Defaults used for jobs, set through the class to make it easy to override
-  $bin_file     = '/bin/curator'
-  $host         = 'localhost'
-  $port         = 9200
-  $jobs         = {}
-  $logfile      = '/var/log/curator.log'
-  $log_level    = 'INFO'
-  $logformat    = 'default'
+  $bin_file             = '/bin/curator'
+  $host                 = 'localhost'
+  $port                 = 9200
+  $use_ssl              = false
+  $ssl_validate         = false
+  $ssl_certificate_path = undef
+  $http_auth            = false
+  $user                 = undef
+  $password             = undef
+  $jobs                 = {}
+  $logfile              = '/var/log/curator.log'
+  $log_level            = 'INFO'
+  $logformat            = 'default'
 }
