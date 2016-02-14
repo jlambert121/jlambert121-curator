@@ -267,6 +267,9 @@ define curator::job (
     } else {
       $ssl_certificate = undef
     }
+  } else {
+    $ssl_certificate = undef
+    $ssl_no_validate = undef
   }
 
   if $http_auth {

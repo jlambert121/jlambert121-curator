@@ -42,9 +42,16 @@ class curator::repo {
       }
     }
     'RedHat': {
+      # Support for facter 3
+      if $::operatingsystemmajrelease {
+        $_ver = $::operatingsystemmajrelease
+      } else {
+        $_ver =$::os['release']['major']
+      }
+
       yumrepo { 'curator':
         descr    => 'Curator Centos Repo',
-        baseurl  => "http://packages.elastic.co/curator/${curator::repo_version}/centos/${::operatingsystemmajrelease}",
+        baseurl  => "http://packages.elastic.co/curator/${curator::repo_version}/centos/${_ver}",
         gpgcheck => 1,
         gpgkey   => 'http://packages.elastic.co/GPG-KEY-elasticsearch',
         enabled  => 1,
