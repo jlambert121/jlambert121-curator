@@ -1,3 +1,5 @@
+20160214 - v2.3.0
+  upport SSL certificate path and expose auth parameters at a global level (Greg Swift)
 20160113 - v2.2.0
   Rename evenup-curator to jlambert121-curator
   Add support for curator jobs in hiera (Petter Abrahamsson)
