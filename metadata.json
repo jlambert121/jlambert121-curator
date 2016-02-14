@@ -1,6 +1,6 @@
 {
   "name": "jlambert121-curator",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "author": "Justin Lambert <jlambert@eml.cc>",
   "license": "Apache-2.0",
   "summary": "Installs elasticsearch curator and schedules cron jobs",
