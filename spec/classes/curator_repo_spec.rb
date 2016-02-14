@@ -13,12 +13,13 @@ describe 'curator', :type => :class do
   context 'Repo class on RedHat/CentOS' do
     let(:facts) do
       {
-        :osfamily => 'RedHat',
+        :osfamily                  => 'RedHat',
+        :operatingsystemmajrelease => '7'
       }
     end
 
     it { should create_class('curator::repo') }
-    it { should contain_yumrepo('curator').with(:baseurl => 'http://packages.elastic.co/curator/3/centos/') }
+    it { should contain_yumrepo('curator').with(:baseurl => 'http://packages.elastic.co/curator/3/centos/7') }
   end
 
   context 'Repo class on Debian/Ubuntu' do
@@ -36,7 +37,8 @@ describe 'curator', :type => :class do
   context 'set package version and package name and manage repository for yum' do
     let(:facts) do
       {
-        :osfamily => 'RedHat',
+        :osfamily                  => 'RedHat',
+        :operatingsystemmajrelease => '7'
       }
     end
     it { should contain_package('python-elasticsearch-curator').with(:ensure => '3.4.0') }
