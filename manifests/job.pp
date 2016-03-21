@@ -102,7 +102,7 @@ define curator::job (
     if !is_string($exclude) and !is_array($exclude) {
       fail("curator::job[${name}]: exclude must be an array or array of strings")
     } else {
-      $_exclude = inline_template("<%= Array(@exclude).map { |element| \"--exclude #{element}\" }.join(' ') %>")
+      $_exclude = inline_template("<%= Array(@exclude).map { |element| \"--exclude \'#{element}\'\" }.join(' ') %>")
     }
   } else {
     $_exclude = undef
