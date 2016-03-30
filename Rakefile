@@ -1,15 +1,11 @@
-require 'rubygems'
 require 'bundler/setup'
-
-require 'puppetlabs_spec_helper/rake_tasks'
-require 'puppet/version'
-require 'puppet/vendor/semantic/lib/semantic' unless Puppet.version.to_f < 3.6
 require 'puppet-lint/tasks/puppet-lint'
+require 'puppetlabs_spec_helper/rake_tasks'
 require 'puppet-syntax/tasks/puppet-syntax'
 require 'metadata-json-lint/rake_task'
+require 'parallel_tests'
+require 'parallel_tests/cli'
 
-# These gems aren't always present, for instance
-# on Travis with --without development
 begin
   require 'puppet_blacksmith/rake_tasks'
 rescue LoadError # rubocop:disable Lint/HandleExceptions
@@ -27,22 +23,14 @@ exclude_paths = [
   "spec/**/*",
 ]
 
-# Coverage from puppetlabs-spec-helper requires rcov which
-# doesn't work in anything since 1.8.7
 Rake::Task[:coverage].clear
-
 Rake::Task[:lint].clear
 
-PuppetLint.configuration.relative = true
-PuppetLint.configuration.disable_80chars
-PuppetLint.configuration.disable_class_inherits_from_params_class
-PuppetLint.configuration.disable_class_parameter_defaults
 PuppetLint.configuration.fail_on_warnings = true
-
-PuppetLint::RakeTask.new :lint do |config|
-  config.ignore_paths = exclude_paths
-end
-
+PuppetLint.configuration.send('relative')
+PuppetLint.configuration.send('disable_80chars')
+PuppetLint.configuration.send('disable_class_inherits_from_params_class')
+PuppetLint.configuration.ignore_paths = exclude_paths
 PuppetSyntax.exclude_paths = exclude_paths
 
 desc "Run acceptance tests"
@@ -55,14 +43,18 @@ task :contributors do
   system("git log --format='%aN' | sort -u > CONTRIBUTORS")
 end
 
+RuboCop::RakeTask.new
 
-## Need to pull rubocop out of ruby 1.8.7
-tests = [:metadata_lint, :syntax, :lint]
-if RUBY_VERSION > '1.9'
-  tests << :rubocop
-  RuboCop::RakeTask.new
+desc "Parallel spec tests"
+  task :parallel_spec do
+  matched_files = FileList['spec/**/*_spec.rb'].exclude(/fixtures|acceptance/)
+  cli_args = ['-t', 'rspec']
+  cli_args.concat(matched_files)
+
+  Rake::Task[:spec_prep].invoke
+  ParallelTests::CLI.new.run(cli_args)
+  Rake::Task[:spec_clean].invoke
 end
-tests << :spec
 
 desc "Run syntax, lint, and spec tests."
-task :test => tests
+task :test => [:metadata_lint, :syntax, :lint, :rubocop, :parallel_spec]
