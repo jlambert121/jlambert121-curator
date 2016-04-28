@@ -95,7 +95,13 @@ class curator (
   create_resources('curator::job', $jobs)
 
   if ($manage_repo == true) {
-    validate_string($repo_version)
+    # Credit: Used code from GitHub user 'electrical'
+    # Source: https://github.com/elastic/puppet-elasticsearch/commit/fdb7de33ea3252607e02861b9ce83426a3f8a08c
+    if ($repo_version == false) or ($repo_version == undef) {
+      fail('Please fill in a repository version at $repo_version')
+    } else {
+      validate_string($repo_version)
+    }
 
     # Set up repositories
     class { '::curator::repo': } ->
