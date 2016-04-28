@@ -156,6 +156,16 @@ describe 'curator::job', :type => :define do
     end
   end
 
+  context 'not setting email' do
+    let (:params) {{:command => 'snapshot', :repository => 'archive'}}
+    it { should contain_cron('curator_myjob').with(:environment => nil)}
+  end
+
+  context 'setting email' do
+    let (:params) {{:command => 'snapshot', :repository => 'archive', :cron_email => 'admin@example.com'}}
+    it { should contain_cron('curator_myjob').with(:environment => 'MAILTO=admin@example.com')}
+  end
+
   context 'set all other params' do
     let(:params) do
       {

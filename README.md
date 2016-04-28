@@ -369,6 +369,11 @@ Cron.  Minute of the hour to schedule the cron entry
 
 Default: 10
 
+#####`cron_email`
+
+Cron. Set the email address MAILTO field for the errors from the cron job
+
+Default: undef
 
 ### Private classes
 
