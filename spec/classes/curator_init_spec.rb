@@ -25,6 +25,13 @@ describe 'curator', :type => :class do
     it { expect { should raise_error(Puppet::Error) } }
   end
 
+  # Credit: Used some code from GitHub user 'electrical'
+  # Source: https://github.com/elastic/puppet-elasticsearch/commit/fdb7de33ea3252607e02861b9ce83426a3f8a08c
+  context 'when not supplying a repo_version' do
+    let(:params) { { :manage_repo => true, } }
+    it { expect { should raise_error(Puppet::Error, 'Please fill in a repository version at $repo_version') } }
+  end
+
   context 'empty jobs' do
     let(:params) { { :jobs => {} } }
     it { should_not contain_curator__job() }

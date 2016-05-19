@@ -79,7 +79,7 @@ Beaker tests with:
 
     bundle exec rake acceptance
 
-This will use the host described in `spec/acceptance/nodeset/default.yml`
+This will use the host described in `spec/acceptance/nodesets/default.yml`
 by default. To run against another host, set the `BEAKER_set` environment
 variable to the name of a host described by a `.yml` file in the
 `nodeset` directory. For example, to run against CentOS 6.4:
