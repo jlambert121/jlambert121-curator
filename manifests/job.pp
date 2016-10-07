@@ -22,7 +22,7 @@ define curator::job (
   $password              = $::curator::password,
 
   # Options for all indexes
-  $prefix                = 'logstash-',
+  $prefix                = undef,
   $suffix                = undef,
   $regex                 = undef,
   $exclude               = undef,
