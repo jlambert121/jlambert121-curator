@@ -31,7 +31,7 @@ define curator::job (
   $older_than            = undef,
   $newer_than            = undef,
   $time_unit             = 'days',
-  $timestring            = '\%Y.\%m.\%d',
+  $timestring            = '%Y.%m.%d',
   $master_only           = false,
   $logfile               = $::curator::logfile,
   $log_level             = $::curator::log_level,
