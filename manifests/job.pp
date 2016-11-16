@@ -285,7 +285,7 @@ define curator::job (
 
   cron { "curator_${name}":
     ensure  => $ensure,
-    command => "${bin_file} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat} ${options} --host ${host} --port ${port} ${exec} ${index_options} >/dev/null",
+    command => "${bin_file} --logfile ${logfile} --loglevel ${log_level} --logformat ${logformat} ${options} --host ${host} --port ${port} ${exec} ${index_options} 2>>/dev/null >> /var/log/curator_debug.log",
     hour    => $cron_hour,
     minute  => $cron_minute,
     weekday => $cron_weekday,
