@@ -74,13 +74,8 @@ class curator (
           $_provider     = 'apt'
         }
         'RedHat': {
-          if ( $::osrelasemajor == '7' ) {
-            $_package_name = 'elastic-curator'
-            $_provider     = 'yum'
-          } else {
             $_package_name = 'python-elasticsearch-curator'
             $_provider     = 'yum'
-          }
         }
         default: {
           $_package_name = 'elasticsearch-curator'
@@ -108,7 +103,7 @@ class curator (
       ensure   => $ensure,
       provider => $_provider,
     }
-    if ( $::osfamily == 'RedHat' and $::osrelasemajor == '7' and $_provider == 'yum' ) {
+    if ( $::osfamily == 'RedHat' and $::osreleasemajor == '7' and $_provider == 'yum' ) {
       package { python-setuptools:
         ensure   => $ensure,
         provider => $_provider,
@@ -119,7 +114,7 @@ class curator (
       ensure   => $ensure,
       provider => $_provider,
     }
-    if ( $::osfamily == 'RedHat' and $::osrelasemajor == '7' and $_provider == 'yum' ) {
+    if ( $::osfamily == 'RedHat' and $::osreleasemajor == '7' and $_provider == 'yum' ) {
       package { python-setuptools:
         ensure   => $ensure,
         provider => $_provider,
