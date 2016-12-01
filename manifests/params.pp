@@ -8,8 +8,11 @@ class curator::params {
   $provider     = 'pip'
   $manage_repo  = false
   $repo_version = false
+  
   if ( $::osfamily == 'RedHat' and $::osreleasemajor == '7') {
     $package_dependencies = 'python-setuptools'
+  } else {
+    $package_dependencies = undef
   }
 
   # Defaults used for jobs, set through the class to make it easy to override
