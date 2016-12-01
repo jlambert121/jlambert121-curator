@@ -58,6 +58,7 @@ class curator (
   $logformat            = $::curator::params::logformat,
   $manage_repo          = $::curator::params::manage_repo,
   $repo_version         = $::curator::params::repo_version,
+  $package_dependencies = $::curator::params::package_dependencies,
 ) inherits curator::params {
 
   if ( $ensure != 'latest' or $ensure != 'absent' ) {
@@ -103,10 +104,22 @@ class curator (
       ensure   => $ensure,
       provider => $_provider,
     }
+    if ( $package_dependencies != undef and $_provider == 'yum' ) {
+      package { $package_dependencies:
+        ensure   => $ensure,
+        provider => $_provider,
+      }
+    } 
   } else {
     package { $_package_name:
       ensure   => $ensure,
       provider => $_provider,
     }
+    if ( $package_dependencies != undef and $_provider == 'yum' ) {
+      package { python-setuptools:
+        ensure   => $ensure,
+        provider => $_provider,
+      }
+    } 
   }
 }
