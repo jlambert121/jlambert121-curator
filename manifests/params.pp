@@ -9,7 +9,7 @@ class curator::params {
   $manage_repo  = false
   $repo_version = false
   
-  if ( $::osfamily == 'RedHat' and $::osreleasemajor == '7') {
+  if(($facts['os']['distro']['release']['major']+0)>6)and($facts['os']['family']=="RedHat") {
     $package_dependencies = 'python-setuptools'
   } else {
     $package_dependencies = undef
