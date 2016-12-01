@@ -104,7 +104,7 @@ class curator (
       ensure   => $ensure,
       provider => $_provider,
     }
-    if ( $package_dependencies and $_provider == 'yum' ) {
+    if ( $package_dependencies != undef and $_provider == 'yum' ) {
       package { $package_dependencies:
         ensure   => $ensure,
         provider => $_provider,
@@ -115,7 +115,7 @@ class curator (
       ensure   => $ensure,
       provider => $_provider,
     }
-    if ( $package_dependencies and $_provider == 'yum' ) {
+    if ( $package_dependencies != undef and $_provider == 'yum' ) {
       package { python-setuptools:
         ensure   => $ensure,
         provider => $_provider,
