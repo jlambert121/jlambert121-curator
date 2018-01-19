@@ -4,64 +4,64 @@
 #
 #
 define curator::job (
-  $command,
-  $ensure                = 'present',
-  $sub_command           = 'indices',
-  $bin_file              = $::curator::bin_file,
+                                        $command,
+                                        $ensure               = 'present',
+                                        $sub_command          = 'indices',
+                                        $bin_file             = $::curator::bin_file,
 
   # ES config
-  $host                  = $::curator::host,
-  $port                  = $::curator::port,
+                                        $host                 = $::curator::host,
+  Integer                               $port                 = $::curator::port,
 
   # Auth options
-  $use_ssl               = $::curator::use_ssl,
-  $ssl_validate          = $::curator::ssl_validate,
-  $ssl_certificate_path  = $::curator::ssl_certificate_path,
-  $http_auth             = $::curator::http_auth,
-  $user                  = $::curator::user,
-  $password              = $::curator::password,
+  Boolean                               $use_ssl              = $::curator::use_ssl,
+  Boolean                               $ssl_validate         = $::curator::ssl_validate,
+  Optional[String]                      $ssl_certificate_path = $::curator::ssl_certificate_path,
+  Optional[Boolean]                     $http_auth            = $::curator::http_auth,
+  Optional[String]                      $user                 = $::curator::user,
+  Optional[String]                      $password             = $::curator::password,
 
   # Options for all indexes
-  $prefix                = 'logstash-',
-  $suffix                = undef,
-  $regex                 = undef,
-  $exclude               = undef,
-  $index                 = undef,
-  $snapshot              = undef,
-  $older_than            = undef,
-  $newer_than            = undef,
-  $time_unit             = 'days',
-  $timestring            = '\%Y.\%m.\%d',
-  $master_only           = false,
-  $logfile               = $::curator::logfile,
-  $log_level             = $::curator::log_level,
-  $logformat             = $::curator::logformat,
+                                        $prefix               = 'logstash-',
+                                        $suffix               = undef,
+                                        $regex                = undef,
+  Variant[String, Array[String], Undef] $exclude              = undef,
+  Variant[String, Array[String], Undef] $index                = undef,
+  Variant[String, Array[String], Undef] $snapshot             = undef,
+  Variant[Integer, Undef]               $older_than           = undef,
+  Variant[Integer, Undef]               $newer_than           = undef,
+                                        $time_unit            = 'days',
+                                        $timestring           = '\%Y.\%m.\%d',
+  Boolean                               $master_only          = false,
+                                        $logfile              = $::curator::logfile,
+                                        $log_level            = $::curator::log_level,
+                                        $logformat            = $::curator::logformat,
 
   # Alias options
-  $alias_name            = undef,
-  $remove                = false,
+                                        $alias_name           = undef,
+  Boolean                               $remove               = false,
 
   # Allocation options
-  $rule                  = undef,
+                                        $rule                 = undef,
 
   # Delete options
-  $disk_space            = undef,
+  Variant[Integer, Undef]               $disk_space           = undef,
 
-  # Optimize options
-  $delay                 = 0,
-  $max_num_segments      = 2,
-  $request_timeout       = 218600,
+                                        # Optimize options
+  Integer                               $delay                = 0,
+  Integer                               $max_num_segments     = 2,
+  Integer                               $request_timeout      = 218600,
 
-  # Replicas options
-  $count                 = 2,
+                                        # Replicas options
+  Integer                               $count                = 2,
 
-  # Snapshot options
-  $repository            = undef,
+                                        # Snapshot options
+                                        $repository           = undef,
 
-  # Cron params
-  $cron_weekday          = '*',
-  $cron_hour             = 1,
-  $cron_minute           = 10,
+                                        # Cron params
+                                        $cron_weekday         = '*',
+                                        $cron_hour            = 1,
+                                        $cron_minute          = 10,
 ){
 
   include ::curator
@@ -94,58 +94,32 @@ define curator::job (
     $_time_unit = "--time-unit ${time_unit}"
   }
 
-  if !is_integer($port) {
-    fail("curator::job[${name}] port must be integer")
-  }
-
   if $exclude {
-    if !is_string($exclude) and !is_array($exclude) {
-      fail("curator::job[${name}]: exclude must be an array or array of strings")
-    } else {
-      $_exclude = inline_template("<%= Array(@exclude).map { |element| \"--exclude \'#{element}\'\" }.join(' ') %>")
-    }
+    $_exclude = inline_template("<%= Array(@exclude).map { |element| \"--exclude \'#{element}\'\" }.join(' ') %>")
   } else {
     $_exclude = undef
   }
 
   if $index {
-    if !is_string($index) and !is_array($index) {
-      fail("curator::job[${name}]: index must be an array or array of strings")
-    } else {
-      $_index = inline_template("<%= Array(@index).map { |element| \"--index #{element}\" }.join(' ') %>")
-    }
+    $_index = inline_template("<%= Array(@index).map { |element| \"--index #{element}\" }.join(' ') %>")
   } else {
     $_index = undef
   }
 
   if $snapshot {
-    if !is_string($snapshot) and !is_array($snapshot) {
-      fail("curator::job[${name}]: snapshot must be an array or array of strings")
-    } else {
-      $_snapshot = inline_template("<%= Array(@snapshot).map { |element| \"--snapshot #{element}\" }.join(' ') %>")
-    }
+    $_snapshot = inline_template("<%= Array(@snapshot).map { |element| \"--snapshot #{element}\" }.join(' ') %>")
   } else {
     $_snapshot = undef
   }
 
-  validate_bool($master_only)
-
   if $older_than {
-    if !is_integer($older_than) {
-      fail("curator::job[${name}] older_than must be an integer")
-    } else {
-      $_older_than = "--older-than ${older_than}"
-    }
+    $_older_than = "--older-than ${older_than}"
   } else {
     $_older_than = undef
   }
 
   if $newer_than {
-    if !is_integer($newer_than) {
-      fail("curator::job[${name}] newer_than must be an integer")
-    } else {
-      $_newer_than = "--newer-than ${newer_than}"
-    }
+    $_newer_than = "--newer-than ${newer_than}"
   } else {
     $_newer_than = undef
   }
@@ -165,7 +139,6 @@ define curator::job (
         fail("curator::job[${name}] alias_name is required with alias")
       }
       if $remove {
-        validate_bool($remove)
         $_remove = '--remove'
       } else {
         $_remove = undef
@@ -190,9 +163,6 @@ define curator::job (
         fail("curator::job[${name}] delete command supports indices and snapshots sub_command")
       }
       if $disk_space {
-        if !is_integer($disk_space) {
-          fail("curator::job[${name}] disk_space must be an integer")
-        }
         $_ds = "--disk-space ${disk_space}"
       } else {
         $_ds = undef
@@ -207,31 +177,13 @@ define curator::job (
     }
     'optimize': {
       # optimize validations
-      if !is_integer($delay) {
-        fail("curator::job[${name}] delay must be an integer")
-      } else {
-        $_delay = " --delay ${delay}"
-      }
-
-      if !is_integer($max_num_segments) {
-        fail("curator::job[${name}] max_num_segments must be an integer")
-      } else {
-        $_segments = " --max_num_segments ${max_num_segments}"
-      }
-
-      if !is_integer($request_timeout) {
-        fail("curator::job[${name}] request_timeout must be an integer")
-      } else {
-        $_timeout = " --request_timeout ${request_timeout}"
-      }
+      $_delay    = " --delay ${delay}"
+      $_segments = " --max_num_segments ${max_num_segments}"
+      $_timeout  = " --request_timeout ${request_timeout}"
 
       $exec = "optimize${_delay}${_segments}${_timeout} indices"
     }
     'replicas': {
-      if !is_integer($count) {
-        fail("curator::job[${name}] count must be an integer")
-      }
-
       $exec = "replicas --count ${count} indices"
     }
     'snapshot': {
@@ -273,8 +225,6 @@ define curator::job (
   }
 
   if $http_auth {
-    validate_string($user)
-    validate_string($password)
     $auth_string = "--http_auth ${user}:${password}"
   } else {
     $auth_string = undef
